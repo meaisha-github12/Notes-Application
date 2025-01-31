@@ -2,6 +2,7 @@ package com
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +18,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -33,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,17 +45,12 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.takenotes.ApplicationClass
 import com.example.takenotes.HomeView
+import com.example.takenotes.Notes
 import com.example.takenotes.R
 import com.example.takenotes.VLRfontfamily
 import com.example.takenotes.ui.theme.TakeNotesTheme
-
-var notesList = mutableListOf<Note>()
-
-data class Note(
-    val title: String,
-    val body: String,
-)
 
 class AddNotesHere : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,23 +58,6 @@ class AddNotesHere : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         Scaffold(modifier = Modifier.fillMaxSize(),
-//            floatingActionButton = {
-//            FloatingActionButton(containerColor = Color(0xFF92B0F8),
-//                contentColor = Color.White,
-//                modifier = Modifier.padding(8.dp),
-//                onClick = { /*TODO*/
-//                    navigator.push(AddNotesHere())
-//                }) {
-//                Icon(
-//                    painter = painterResource(R.drawable.baseline_add_24),
-//                    contentDescription = "Add Vector Asset",
-//                    modifier = Modifier.size(24.dp),
-//
-//                    )
-//            }
-//        }
-
-
         ) {
 
             EditNotes()
@@ -87,17 +69,21 @@ class AddNotesHere : Screen {
 @Composable
 fun EditNotes(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier) {
     val navigator = LocalNavigator.currentOrThrow
-
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
     var title = remember {
-        mutableStateOf("Untitled")
+        mutableStateOf("")
     }
     val body = remember {
         mutableStateOf("")
     }
 
+    val dao = ApplicationClass.getApp(context).dao
+
     Box(modifier = Modifier.padding(top = 46.dp)) {
         Column(
             modifier = Modifier
+                .verticalScroll(scrollState)
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
@@ -126,43 +112,87 @@ fun EditNotes(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modif
                 )
             }
 
-            OutlinedTextField(
-                value = title.value,
-                onValueChange = { newValue: String ->
-                Log.e("112233", "onValueChanged $newValue")
-                title.value = newValue
-            },
-                label = { Text("Note Title") },
-                modifier = Modifier.fillMaxWidth()
+            Column (
 
-            )
+            ){
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedTextField(
-                value = body.value,
-                onValueChange = { newValue: String ->
-                    Log.e("112233", "onValueChanged $newValue")
-                    body.value = newValue
-                },
-                label = { Text("Note Body") },
-                modifier = Modifier.fillMaxWidth()
 
-            )
+                OutlinedTextField(
+                    value = title.value,
+                    onValueChange = { newValue: String ->
+                        Log.e("112233", "onValueChanged $newValue")
+                        title.value = newValue
+                    },
+                    label = { Text("Note Title",
+                        fontFamily = VLRfontfamily,
+                        color = Color(0xFF8299CF),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                        ) },
+                    placeholder = { Text(text = "Untitled") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = {
-                notesList.add(Note(title.value, title.value))
-                navigator.pop()
-            }) {
-                Text(text = "Save")
+                OutlinedTextField(
+                    value = body.value,
+                    onValueChange = { newValue: String ->
+                        Log.e("112233", "onValueChanged $newValue")
+                        body.value = newValue
+                    },
+                    label = { Text("Note Body",
+                        fontFamily = VLRfontfamily,
+                        color = Color(0xFF8299CF),
+                        fontSize = 16.sp,
+                        ) },
+                    placeholder = { Text(text = "Write Description ") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(350.dp)
+
+                )
             }
-        }
 
+            Spacer(modifier = Modifier.height(24.dp))
+//         FloatingActionButton
+            Row( modifier = Modifier
+                .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center){
+                // Condition
+
+                    FloatingActionButton(
+                        containerColor = Color(0xFF92B0F8),
+                        contentColor = Color.White,
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .width(100.dp),
+                        onClick = {
+                            if (title.value.isNotEmpty() && body.value.isNotEmpty()) {
+                                Thread {
+                                    dao.insertNote(
+                                        Notes(
+                                            tittle = title.value,
+                                            description = body.value
+                                        )
+                                    )
+                                }.start()
+                            navigator.pop()}
+                            else{
+                                val text = "Please fill all the fields"
+                                Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+                            }
+                        }) {
+                        Text(text = "Save", fontSize = 16.sp)
+                    }
+                }
+
+        }
+        }
     }
 
-}
 
 @Preview(showBackground = true)
 @Composable

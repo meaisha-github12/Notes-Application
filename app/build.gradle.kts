@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.devtools.ksp") version "1.9.22-1.0.16"
+
 }
 
 android {
@@ -56,7 +58,7 @@ dependencies {
     val composeVersion = "1.5.1"
 
     implementation(platform(libs.androidx.compose.bom)) // For BOM alignment
-    implementation("androidx.compose.foundation:foundation:$composeVersion") // Using foundation with explicit version
+    implementation(libs.androidx.foundation) // Using foundation with explicit version
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -72,4 +74,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.ui.tooling.preview)  // Add this line
+    debugImplementation(libs.ui.tooling)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.library.base)
+    implementation(libs.androidx.room.runtime) // Room Runtime
+    implementation(libs.androidx.room.ktx) // Kotlin Extensions
+    ksp(libs.androidx.room.compiler) // KSP Compiler instead of KAPT
+
 }
