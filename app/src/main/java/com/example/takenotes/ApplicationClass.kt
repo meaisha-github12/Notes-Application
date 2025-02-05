@@ -4,18 +4,26 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 
-class ApplicationClass: Application() {
-     private val db: AppDB by lazy{
-        // creating instance of AppDB using Room's databaseBuilder method.
-        Room.databaseBuilder(
-         applicationContext,
-            AppDB::class.java,
-            "notes.db"
+class ApplicationClass : Application() {
 
-        )
-            .build()
+    lateinit var themePrefs: ThemePreferences
+
+    override fun onCreate() {
+        super.onCreate()
+        // Initialize themePrefs safely
+        //This themePrefs object can now be used to save or retrieve
+        // the theme preference from SharedPreferences.
+        themePrefs = ThemePreferences(this.applicationContext)
     }
-     val dao: NotesDao by lazy{
+
+    // for DB
+    private val db: AppDB by lazy {
+        Room.databaseBuilder(
+            applicationContext, AppDB::class.java, "notes.db"
+
+        ).build()
+    }
+    val dao: NotesDao by lazy {
         db.notesDao()
     }
 

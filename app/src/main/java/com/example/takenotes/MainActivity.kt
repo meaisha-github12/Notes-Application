@@ -1,16 +1,14 @@
 package com.example.takenotes
 
-import android.annotation.SuppressLint
 import androidx.compose.ui.tooling.preview.Preview
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +25,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +34,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,56 +48,50 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.Room
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.AddNotesHere
-import com.THEME_DARK
-import com.THEME_LIGHT
-import com.THEME_SYSTEM
-import com.ThemePreference
 import com.example.takenotes.ui.theme.TakeNotesTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
-
+    lateinit var themePreferences: ThemePreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        themePreferences = ThemePreferences(this)
         enableEdgeToEdge()
-
+        themePreferences.savedData()
         setContent {
+            val currentTheme = themePreferences.defThemeMode.value
 
-            val context = LocalContext.current
-            val themeMode = ThemePreference.getThemePreference(context)
             TakeNotesTheme(
-                darkTheme = when(themeMode){
-                    THEME_DARK-> true
-                    THEME_LIGHT -> false
-                    else -> isSystemInDarkTheme()
+                darkTheme = when (currentTheme) {
+                    "light" -> false // If the saved theme is "light", set darkTheme to false (light mode)
+                    "dark" -> true        // If the saved theme is "dark", set darkTheme to true (dark mode)
+                    else -> isSystemInDarkTheme() // If no saved preference, fall back to the system theme
                 }
-//                darkTheme = isSystemInDarkTheme()
             ) {
-                Navigator(HomeScreen())
-
+                Navigator(HomeScreen(themePreferences))
             }
         }
     }
 }
 
-class HomeScreen() : Screen {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+class HomeScreen(val themePreferences: ThemePreferences) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        Scaffold(modifier = Modifier.fillMaxSize(
+        Scaffold(
+            modifier = Modifier.fillMaxSize(
 
-        ) ) {
+            )
+        ) { paddingValues ->
 
-            HomeView()
+            HomeView(
+                modifier = Modifier.padding(paddingValues), themePreferences = themePreferences
+            )
 
 
         }
@@ -110,29 +102,42 @@ class HomeScreen() : Screen {
 val VLRfontfamily = FontFamily(Font(R.font.varelaroundregular))
 
 
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeView(modifier: Modifier = Modifier) {
+fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) {
     val navigator = LocalNavigator.currentOrThrow
 
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao
+
+    var isDialogShown by remember {
+        mutableStateOf(false)
+    }
 
     val notesList = remember {
         mutableStateOf<List<Notes>>(emptyList())
     }
 
     LaunchedEffect(Unit) {
-        Thread{
+        Thread {
             notesList.value = dao.getAllNotes()
         }.start()
     }
 
-   // val themePreference = ThemePreference(context)
+    if (isDialogShown) {
+        AlertDialog(onDismissRequest = {
+            isDialogShown = false
+        },
+            confirmButton = { /*TODO*/ },
+            title = { Text(text = "Confirmation") },
+            text = { Text(text = "Are you sure you want to delete this note?") })
+    }
+
+    // val themePreference = ThemePreference(context)
 
     var checked by remember { mutableStateOf(true) }
-    Box(modifier = Modifier.padding(top = 46.dp)) {
-        Column(modifier.padding(12.dp)) {
+    Box(modifier = modifier.padding(top = 46.dp)) {
+        Column(Modifier.padding(12.dp)) {
             // Top bar with menu icon and profile picture
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -149,6 +154,7 @@ fun HomeView(modifier: Modifier = Modifier) {
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
+
                 Image(
                     painter = painterResource(R.drawable.girl),
                     contentDescription = "profile",
@@ -156,14 +162,8 @@ fun HomeView(modifier: Modifier = Modifier) {
                         .padding(end = 32.dp)
                         .size(48.dp)
                 )
-                Switch(checked = checked, onCheckedChange ={checked = it},
-                    modifier = Modifier
-                        .size(50.dp)
-                        .padding(4.dp)
-                        .clip(CircleShape),
+                switchButton(themePreferences)
 
-
-                )
             }
             Spacer(
                 modifier = Modifier.padding(12.dp)
@@ -178,7 +178,7 @@ fun HomeView(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
-            Spacer(modifier.padding(12.dp))
+            //    Spacer(modifier.padding(12.dp))
             // LazyVerticalStaggeredGrid Only
             LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp),
                 modifier = Modifier
@@ -190,6 +190,9 @@ fun HomeView(modifier: Modifier = Modifier) {
                             modifier = Modifier
                                 .padding(8.dp)
                                 .width(100.dp)
+                                .combinedClickable(onClick = {}, onLongClick = {
+                                    isDialogShown = true
+                                })
 //                                .height((65 + (index % 5) * 30).dp)
                                 .background(
                                     Color(0xFF7793D6), shape = RoundedCornerShape(12.dp)
@@ -197,38 +200,35 @@ fun HomeView(modifier: Modifier = Modifier) {
                                 )
 
                         ) {
-                            Column(){
-                            Text(
-                                text = note.tittle,
-                                modifier = Modifier.padding(8.dp),
-                                fontSize = 18.sp,
-                                fontFamily = VLRfontfamily,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = note.description,
-                                modifier = Modifier.padding(8.dp),
-                                fontSize = 16.sp,
-                                fontFamily = VLRfontfamily,
-                                color = Color.White
-                            )}
+                            Column() {
+                                Text(
+                                    text = note.tittle,
+                                    modifier = Modifier.padding(8.dp),
+                                    fontSize = 18.sp,
+                                    fontFamily = VLRfontfamily,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = note.description,
+                                    modifier = Modifier.padding(8.dp),
+                                    fontSize = 16.sp,
+                                    fontFamily = VLRfontfamily,
+                                    color = Color.White
+                                )
+                            }
                         }
 
                     }
                 })
             // Floating Button
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
             ) {
-                FloatingActionButton(
-                    containerColor = Color(0xFF92B0F8),
+                FloatingActionButton(containerColor = Color(0xFF92B0F8),
                     contentColor = Color.White,
                     shape = RoundedCornerShape(18.dp),
-                    modifier = Modifier
-                        .padding(12.dp),
+                    modifier = Modifier.padding(12.dp),
                     onClick = { /*TODO*/
                         navigator.push(AddNotesHere())
                     }) {
@@ -242,13 +242,14 @@ fun HomeView(modifier: Modifier = Modifier) {
                                 .padding(4.dp)
                                 .size(26.dp)
                         )
-                      //  Spacer(modifier = Modifier.width(2.dp)) // Space between icon and te
-                        Text(text = "Create",
+                        //  Spacer(modifier = Modifier.width(2.dp)) // Space between icon and te
+                        Text(
+                            text = "Create",
                             fontSize = 16.sp,
                             fontFamily = VLRfontfamily,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            modifier =Modifier.padding(6.dp)
+                            modifier = Modifier.padding(6.dp)
                         )
                     }
                 }
@@ -260,18 +261,28 @@ fun HomeView(modifier: Modifier = Modifier) {
 
 }
 
+@Composable
+fun switchButton(themePreferences: ThemePreferences) {
+    val currentTheme by themePreferences.defThemeMode
+
+    Switch(
+        checked = currentTheme == "dark",  // Is the current theme dark? If yes, switch is on (checked)
+        onCheckedChange = { isChecked -> // When the user toggles the switch
+            val newThemeMode = if (isChecked) "dark" else "light" // Determine the new theme
+            themePreferences.savingData(newThemeMode)  // Save the new theme mode in preferences
+        },
+        modifier = Modifier
+            .size(50.dp)
+            .padding(4.dp)
+            .clip(CircleShape),
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    val some: Some = SomeChild()
 
     TakeNotesTheme {
-        HomeView()
+
     }
 }
-
-abstract class Some {
-
-}
-
-class SomeChild: Some(){}

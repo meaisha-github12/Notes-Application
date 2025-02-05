@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +52,9 @@ import com.example.takenotes.Notes
 import com.example.takenotes.R
 import com.example.takenotes.VLRfontfamily
 import com.example.takenotes.ui.theme.TakeNotesTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class AddNotesHere : Screen {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -65,6 +69,8 @@ class AddNotesHere : Screen {
 
     }
 }
+
+suspend fun somecode(){}
 
 @Composable
 fun EditNotes(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier) {
@@ -171,14 +177,23 @@ fun EditNotes(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modif
                             .width(100.dp),
                         onClick = {
                             if (title.value.isNotEmpty() && body.value.isNotEmpty()) {
-                                Thread {
+//                                Thread {
+//                                    dao.insertNote(
+//                                        Notes(
+//                                            tittle = title.value,
+//                                            description = body.value
+//                                        )
+//                                    )
+//                                }.start()
+                                GlobalScope.launch(Dispatchers.IO)
+                                {
                                     dao.insertNote(
                                         Notes(
                                             tittle = title.value,
-                                            description = body.value
+                                               description = body.value
                                         )
                                     )
-                                }.start()
+                                }
                             navigator.pop()}
                             else{
                                 val text = "Please fill all the fields"
