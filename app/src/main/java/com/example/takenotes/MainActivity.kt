@@ -1,10 +1,14 @@
 package com.example.takenotes
 
+import android.icu.text.CaseMap.Title
+import android.os.Build
 import androidx.compose.ui.tooling.preview.Preview
 import android.os.Bundle
+import android.service.quicksettings.Tile
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +30,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +60,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.AddNotesHere
 import com.example.takenotes.ui.theme.TakeNotesTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
@@ -79,6 +89,7 @@ class MainActivity : ComponentActivity() {
 }
 
 class HomeScreen(val themePreferences: ThemePreferences) : Screen {
+    @RequiresApi(Build.VERSION_CODES.Q)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -102,6 +113,7 @@ class HomeScreen(val themePreferences: ThemePreferences) : Screen {
 val VLRfontfamily = FontFamily(Font(R.font.varelaroundregular))
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) {
@@ -110,28 +122,58 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao
 
-    var isDialogShown by remember {
-        mutableStateOf(false)
+    var selectedNoteToDelete by remember {
+        mutableStateOf<Notes?>(null)
     }
+    val coroutineScope = rememberCoroutineScope()
 
-    val notesList = remember {
-        mutableStateOf<List<Notes>>(emptyList())
-    }
+    var notesList = remember { mutableStateOf<List<Notes>>(emptyList()) }
 
+    // Use a coroutine to load the notes from the database
     LaunchedEffect(Unit) {
-        Thread {
+        // Fetch notes in the IO dispatcher
+        withContext(Dispatchers.IO) {
             notesList.value = dao.getAllNotes()
-        }.start()
+        }
     }
 
-    if (isDialogShown) {
-        AlertDialog(onDismissRequest = {
-            isDialogShown = false
-        },
-            confirmButton = { /*TODO*/ },
-            title = { Text(text = "Confirmation") },
-            text = { Text(text = "Are you sure you want to delete this note?") })
+
+    if (selectedNoteToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { selectedNoteToDelete = null },
+
+            confirmButton = {
+                Button(onClick = {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        val note = selectedNoteToDelete!!
+                        dao.deleteNote(note)
+                        val updateNotes = dao.getAllNotes()
+                        withContext(Dispatchers.Main) {
+                            notesList.value = updateNotes
+                            selectedNoteToDelete = null
+
+                        }
+                    }
+                }) {
+                    Text(text = "Yes")
+                }
+
+            },
+            dismissButton = {
+                Button(onClick = {
+                    selectedNoteToDelete = null
+                }) {
+                    Text(text = "No")
+                }
+            },
+            title = { Text("Conformation") },
+            text = { Text("Are you sure you want to delete this ${selectedNoteToDelete!!.id}th note") },
+
+            )
     }
+
+
+//
 
     // val themePreference = ThemePreference(context)
 
@@ -191,7 +233,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                                 .padding(8.dp)
                                 .width(100.dp)
                                 .combinedClickable(onClick = {}, onLongClick = {
-                                    isDialogShown = true
+                                    selectedNoteToDelete = note
                                 })
 //                                .height((65 + (index % 5) * 30).dp)
                                 .background(
