@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotesDao {
@@ -16,6 +17,9 @@ interface NotesDao {
 
     @Query("SELECT * FROM notes")
     suspend fun getAllNotes(): List<Notes>
+
+    @Query("SELECT * FROM notes")
+    fun getAllNotesFlow(): Flow<List<Notes>>
 
     @Update
     suspend fun updateNote(note: Notes)

@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.compose.ui.tooling.preview.Preview
 import android.os.Bundle
 import android.service.quicksettings.Tile
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -54,6 +55,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -69,6 +71,17 @@ class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val dao = ApplicationClass.getApp(this).dao
+
+        lifecycleScope.launch(Dispatchers.IO){
+            dao.getAllNotesFlow().collect { notes ->
+                withContext(Dispatchers.Main){
+                    Toast.makeText(this@MainActivity,"Notes: ${notes.size}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         themePreferences = ThemePreferences(this)
         enableEdgeToEdge()
         themePreferences.savedData()
@@ -133,7 +146,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
     LaunchedEffect(Unit) {
         // Fetch notes in the IO dispatcher
         withContext(Dispatchers.IO) {
-            notesList.value = dao.getAllNotes()
+            dao.getAllNotesFlow().collect {
+                notesList.value = it
+            }
         }
     }
 
@@ -145,13 +160,13 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             confirmButton = {
                 Button(onClick = {
                     coroutineScope.launch(Dispatchers.IO) {
-                        val note = selectedNoteToDelete!!
-                        dao.deleteNote(note)
-                        val updateNotes = dao.getAllNotes()
-                        withContext(Dispatchers.Main) {
-                            notesList.value = updateNotes
-                            selectedNoteToDelete = null
+//                        val note = selectedNoteToDelete!!
+//                        dao.deleteNote(note)
+//                        selectedNoteToDelete =null
 
+                        selectedNoteToDelete?.let {
+                            dao.deleteNote(it)
+                            selectedNoteToDelete = null
                         }
                     }
                 }) {
