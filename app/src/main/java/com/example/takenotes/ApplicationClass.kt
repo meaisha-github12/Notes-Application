@@ -3,6 +3,8 @@ package com.example.takenotes
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 class ApplicationClass : Application() {
 
@@ -21,7 +23,15 @@ class ApplicationClass : Application() {
         Room.databaseBuilder(
             applicationContext, AppDB::class.java, "notes.db"
 
-        ).build()
+        )
+//            .addMigrations(object : Migration(1,2) {
+//                override fun migrate(db: SupportSQLiteDatabase) {
+//                    db.execSQL("ALTER TABLE notes ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0")
+//                }
+//
+//            })
+            .fallbackToDestructiveMigration()
+            .build()
     }
     val dao: NotesDao by lazy {
         db.notesDao()

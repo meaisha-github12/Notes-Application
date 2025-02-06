@@ -18,7 +18,7 @@ interface NotesDao {
     @Query("SELECT * FROM notes")
     suspend fun getAllNotes(): List<Notes>
 
-    @Query("SELECT * FROM notes")
+    @Query("SELECT * FROM notes ORDER BY updatedAt DESC")
     fun getAllNotesFlow(): Flow<List<Notes>>
 
     @Update

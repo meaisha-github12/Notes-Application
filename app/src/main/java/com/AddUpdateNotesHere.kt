@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -44,6 +45,8 @@ import com.example.takenotes.ui.theme.TakeNotesTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Date
 
 data class AddUpdateNotesHere(
     val notes: Notes? = null
@@ -78,6 +81,8 @@ fun EditNotes(modifier: Modifier = Modifier,
     }
 
     val dao = ApplicationClass.getApp(context).dao
+
+
 
     Box(modifier = Modifier.padding(top = 46.dp)) {
         Column(
@@ -183,7 +188,8 @@ fun EditNotes(modifier: Modifier = Modifier,
                                         dao.insertNote(
                                             Notes(
                                                 tittle = title.value,
-                                                description = body.value
+                                                description = body.value,
+
                                             )
                                         )
                                     } else {
@@ -191,7 +197,8 @@ fun EditNotes(modifier: Modifier = Modifier,
                                             Notes(
                                                 id = notes.id,
                                                 tittle = title.value,
-                                                description = body.value
+                                                description = body.value,
+                                                updatedAt = System.currentTimeMillis()
                                             )
                                         )
                                     }

@@ -63,6 +63,8 @@ import com.example.takenotes.ui.theme.TakeNotesTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
@@ -71,10 +73,11 @@ class MainActivity : ComponentActivity() {
 
         val dao = ApplicationClass.getApp(this).dao
 
-        lifecycleScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO) {
             dao.getAllNotesFlow().collect { notes ->
-                withContext(Dispatchers.Main){
-                    Toast.makeText(this@MainActivity,"Notes: ${notes.size}", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Notes: ${notes.size}", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -183,6 +186,14 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
             )
     }
+            fun formatTimeStamp(timeStamp : Long): String {
+                val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+                return simpleDateFormat.format(Date(timeStamp))
+
+            }
+
+
+
     // val themePreference = ThemePreference(context)
     var checked by remember { mutableStateOf(true) }
     Box(modifier = modifier.padding(top = 46.dp)) {
@@ -229,7 +240,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             )
             //    Spacer(modifier.padding(12.dp))
             // LazyVerticalStaggeredGrid Only
-            LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp),
+            LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(150.dp),
                 modifier = Modifier
                     // weight here
                     .weight(1f),
@@ -238,7 +249,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                         Box(
                             modifier = Modifier
                                 .padding(8.dp)
-                                .width(100.dp)
+                              //  .width(100.dp)
                                 .combinedClickable(onClick = {}, onLongClick = {
                                     selectedNoteToDelete = note
                                 })
@@ -248,17 +259,17 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
                                 )
 
+
                         ) {
-                            Column() {
+                            Column {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.End
 
                                 ) {
-                                    IconButton(
-                                        modifier = Modifier
-                                            .padding(8.dp)
-                                            .size(18.dp),
+                                    IconButton(modifier = Modifier
+                                        .padding(8.dp)
+                                        .size(18.dp),
                                         // handle design
                                         onClick = {
                                             navigator.push(AddUpdateNotesHere(note))
@@ -271,6 +282,13 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
                                     }
                                 }
+
+                                Text(text = formatTimeStamp(note.updatedAt),
+                                    modifier = Modifier.padding(8.dp),
+                                    fontSize = 12.sp,
+                                    fontFamily = VLRfontfamily,
+                                    color = Color.White,
+                                    )
                                 Text(
                                     text = note.tittle,
                                     modifier = Modifier.padding(8.dp),
@@ -286,6 +304,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                                     fontFamily = VLRfontfamily,
                                     color = Color.White
                                 )
+
                             }
                         }
 
@@ -330,6 +349,8 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
 
 }
+
+
 
 @Composable
 fun switchButton(themePreferences: ThemePreferences) {
