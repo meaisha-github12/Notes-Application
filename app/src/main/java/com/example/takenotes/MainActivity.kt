@@ -1,10 +1,8 @@
 package com.example.takenotes
 
-import android.icu.text.CaseMap.Title
 import android.os.Build
 import androidx.compose.ui.tooling.preview.Preview
 import android.os.Bundle
-import android.service.quicksettings.Tile
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -60,10 +58,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.AddNotesHere
+import com.AddUpdateNotesHere
 import com.example.takenotes.ui.theme.TakeNotesTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -263,7 +260,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                                             .padding(8.dp)
                                             .size(18.dp),
                                         // handle design
-                                        onClick = { /*TODO*/ }) {
+                                        onClick = {
+                                            navigator.push(AddUpdateNotesHere(note))
+                                        }) {
                                         Icon(
                                             painter = painterResource(R.drawable.pencil),
                                             tint = Color.Unspecified,
@@ -301,7 +300,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.padding(12.dp),
                     onClick = { /*TODO*/
-                        navigator.push(AddNotesHere())
+                        navigator.push(AddUpdateNotesHere())
                     }) {
                     Row(
                         modifier = Modifier.padding(8.dp),
