@@ -167,16 +167,11 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                 }
             },
             title = { Text("Conformation") },
-            text = { Text("Are you sure you want to delete this ${selectedNoteToDelete!!.id}th note") },
+            text = { Text("Are you sure you want to delete ${selectedNoteToDelete!!.tittle}? ") },
 
             )
     }
-
-
-//
-
     // val themePreference = ThemePreference(context)
-
     var checked by remember { mutableStateOf(true) }
     Box(modifier = modifier.padding(top = 46.dp)) {
         Column(Modifier.padding(12.dp)) {
@@ -243,6 +238,25 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
                         ) {
                             Column() {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+
+                                ) {
+                                    IconButton(
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .size(18.dp),
+                                        // handle design
+                                        onClick = { /*TODO*/ }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.pencil),
+                                            tint = Color.Unspecified,
+                                            contentDescription = "edit"
+                                        )
+
+                                    }
+                                }
                                 Text(
                                     text = note.tittle,
                                     modifier = Modifier.padding(8.dp),

@@ -29,16 +29,6 @@ class ApplicationClass : Application() {
 
     companion object {
         fun getApp(context: Context): ApplicationClass {
-
-            val num = 200
-            if (num > 300) {
-                println("number is greater than 300")
-            }
-            else{
-                println("number is less than 300")
-
-            }
-
             return context.applicationContext as ApplicationClass
         }
     }

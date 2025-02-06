@@ -16,4 +16,8 @@ interface NotesDao {
 
     @Query("SELECT * FROM notes")
     fun getAllNotes(): List<Notes>
+
+    @Update
+    fun updateNote(note: Notes)
+
 }

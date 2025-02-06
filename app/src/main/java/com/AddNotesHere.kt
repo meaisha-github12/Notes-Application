@@ -146,7 +146,6 @@ fun EditNotes(modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modif
                 OutlinedTextField(
                     value = body.value,
                     onValueChange = { newValue: String ->
-                        Log.e("112233", "onValueChanged $newValue")
                         body.value = newValue
                     },
                     label = { Text("Note Body",
