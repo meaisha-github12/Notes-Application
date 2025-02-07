@@ -1,6 +1,7 @@
 package com.example.takenotes.ui.screens.home
 
 import android.os.Build
+import android.text.format.DateUtils
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -55,8 +56,6 @@ import com.example.takenotes.ui.screens.components.NoteCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Date
-import java.util.Locale
 
 class HomeScreen(val themePreferences: ThemePreferences) : Screen {
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -223,10 +222,18 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
         }
     }
 }
-fun formatTimeStamp(timeStamp: Long): String {
-    val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
-    return simpleDateFormat.format(Date(timeStamp))
+//fun formatTimeStamp(timeStamp: Long): String {
+//    val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+//    return simpleDateFormat.format(Date(timeStamp))
+//}
+fun getRelativeTime(timeStamp: Long):String
+{
+    return DateUtils.getRelativeTimeSpanString(timeStamp,
+        System.currentTimeMillis(),
+        DateUtils.SECOND_IN_MILLIS,
+        ).toString()
 }
+
 @Composable
 fun switchButton(themePreferences: ThemePreferences) {
     val currentTheme by themePreferences.defThemeMode

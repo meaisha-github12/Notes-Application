@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.VLRfontfamily
-import com.example.takenotes.ui.screens.home.formatTimeStamp
+import com.example.takenotes.ui.screens.home.getRelativeTime
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteCard(
@@ -43,7 +44,7 @@ fun NoteCard(
     ) {
         Column {
             Text(
-                text = formatTimeStamp(note.updatedAt),
+                text = getRelativeTime(note.updatedAt),
                 modifier = Modifier.padding(8.dp),
                 fontSize = 12.sp,
                 fontFamily = VLRfontfamily,

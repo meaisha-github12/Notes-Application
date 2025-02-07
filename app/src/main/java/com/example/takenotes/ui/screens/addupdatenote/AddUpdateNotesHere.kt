@@ -1,5 +1,4 @@
 package com.example.takenotes.ui.screens.addupdatenote
-
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
@@ -53,10 +52,8 @@ data class AddUpdateNotesHere(
         val navigator = LocalNavigator.currentOrThrow
         Scaffold(modifier = Modifier.fillMaxSize(),
         ) {
-
             EditNotes(notes = notes)
         }
-
     }
 }
 @Composable
@@ -74,9 +71,6 @@ fun EditNotes(modifier: Modifier = Modifier,
     }
 
     val dao = ApplicationClass.getApp(context).dao
-
-
-
     Box(modifier = Modifier.padding(top = 46.dp)) {
         Column(
             modifier = Modifier
@@ -158,7 +152,6 @@ fun EditNotes(modifier: Modifier = Modifier,
                 .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center){
                 // Condition
-
                     FloatingActionButton(
                         containerColor = Color(0xFF92B0F8),
                         contentColor = Color.White,
