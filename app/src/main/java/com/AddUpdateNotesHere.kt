@@ -23,7 +23,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,15 +37,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.takenotes.ApplicationClass
-import com.example.takenotes.Notes
+import com.example.takenotes.data.Notes
 import com.example.takenotes.R
-import com.example.takenotes.VLRfontfamily
-import com.example.takenotes.ui.theme.TakeNotesTheme
+import com.example.takenotes.ui.screens.home.VLRfontfamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Date
 
 data class AddUpdateNotesHere(
     val notes: Notes? = null

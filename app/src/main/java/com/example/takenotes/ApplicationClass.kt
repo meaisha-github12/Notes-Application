@@ -3,8 +3,8 @@ package com.example.takenotes
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.takenotes.data.AppDB
+import com.example.takenotes.data.NotesDao
 
 class ApplicationClass : Application() {
 
