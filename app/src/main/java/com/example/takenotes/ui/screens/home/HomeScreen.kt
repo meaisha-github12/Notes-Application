@@ -49,10 +49,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.AddUpdateNotesHere
-import com.example.takenotes.ApplicationClass
+import com.example.takenotes.ui.screens.addupdatenote.AddUpdateNotesHere
+import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.R
-import com.example.takenotes.ThemePreferences
+import com.example.takenotes.core.ThemePreferences
 import com.example.takenotes.data.Notes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

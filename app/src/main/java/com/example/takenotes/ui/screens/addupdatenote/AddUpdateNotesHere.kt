@@ -1,4 +1,4 @@
-package com
+package com.example.takenotes.ui.screens.addupdatenote
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.example.takenotes.ApplicationClass
+import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.data.Notes
 import com.example.takenotes.R
 import com.example.takenotes.ui.screens.home.VLRfontfamily

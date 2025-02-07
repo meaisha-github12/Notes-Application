@@ -1,4 +1,4 @@
-package com.example.takenotes
+package com.example.takenotes.core
 
 import android.content.Context
 import android.content.SharedPreferences
