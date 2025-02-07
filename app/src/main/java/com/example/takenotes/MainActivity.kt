@@ -248,7 +248,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                             modifier = Modifier
                                 .padding(8.dp)
                                 .width(100.dp)
-                                .combinedClickable(onClick = {}, onLongClick = {
+                                .combinedClickable(onClick = {
+                                    navigator.push(AddUpdateNotesHere(note))
+                                }, onLongClick = {
                                     selectedNoteToDelete = note
                                 })
 //                                .height((65 + (index % 5) * 30).dp)
@@ -259,26 +261,6 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
                         ) {
                             Column {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
-
-                                ) {
-                                    IconButton(modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(18.dp),
-                                        // handle design
-                                        onClick = {
-                                            navigator.push(AddUpdateNotesHere(note))
-                                        }) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.pencil),
-                                            tint = Color.Unspecified,
-                                            contentDescription = "edit"
-                                        )
-
-                                    }
-                                }
 
                                 Text(
                                     text = formatTimeStamp(note.updatedAt),
