@@ -152,7 +152,6 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
         }
     }
 
-
     if (selectedNoteToDelete != null) {
         AlertDialog(
             onDismissRequest = { selectedNoteToDelete = null },
@@ -186,12 +185,11 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
             )
     }
-            fun formatTimeStamp(timeStamp : Long): String {
-                val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
-                return simpleDateFormat.format(Date(timeStamp))
+    fun formatTimeStamp(timeStamp: Long): String {
+        val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+        return simpleDateFormat.format(Date(timeStamp))
 
-            }
-
+    }
 
 
     // val themePreference = ThemePreference(context)
@@ -240,7 +238,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             )
             //    Spacer(modifier.padding(12.dp))
             // LazyVerticalStaggeredGrid Only
-            LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(150.dp),
+            LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp),
                 modifier = Modifier
                     // weight here
                     .weight(1f),
@@ -249,7 +247,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                         Box(
                             modifier = Modifier
                                 .padding(8.dp)
-                              //  .width(100.dp)
+                                .width(100.dp)
                                 .combinedClickable(onClick = {}, onLongClick = {
                                     selectedNoteToDelete = note
                                 })
@@ -258,7 +256,6 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                                     Color(0xFF7793D6), shape = RoundedCornerShape(12.dp)
 
                                 )
-
 
                         ) {
                             Column {
@@ -283,12 +280,13 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                                     }
                                 }
 
-                                Text(text = formatTimeStamp(note.updatedAt),
+                                Text(
+                                    text = formatTimeStamp(note.updatedAt),
                                     modifier = Modifier.padding(8.dp),
                                     fontSize = 12.sp,
                                     fontFamily = VLRfontfamily,
                                     color = Color.White,
-                                    )
+                                )
                                 Text(
                                     text = note.tittle,
                                     modifier = Modifier.padding(8.dp),
@@ -297,8 +295,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold
                                 )
+                                val previewText = note.description.take(40) + "..."
                                 Text(
-                                    text = note.description,
+                                    text = previewText,
                                     modifier = Modifier.padding(8.dp),
                                     fontSize = 16.sp,
                                     fontFamily = VLRfontfamily,
@@ -349,7 +348,6 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
 
 }
-
 
 
 @Composable
