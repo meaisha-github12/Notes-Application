@@ -4,8 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -49,11 +46,12 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.example.takenotes.ui.screens.addupdatenote.AddUpdateNotesHere
-import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.R
+import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.core.ThemePreferences
 import com.example.takenotes.data.Notes
+import com.example.takenotes.ui.screens.addupdatenote.AddUpdateNotesHere
+import com.example.takenotes.ui.screens.components.NoteCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,32 +73,23 @@ class HomeScreen(val themePreferences: ThemePreferences) : Screen {
             HomeView(
                 modifier = Modifier.padding(paddingValues), themePreferences = themePreferences
             )
-
-
         }
-
     }
 }
 
 val VLRfontfamily = FontFamily(Font(R.font.varelaroundregular))
-
-
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) {
     val navigator = LocalNavigator.currentOrThrow
-
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao
-
     var selectedNoteToDelete by remember {
         mutableStateOf<Notes?>(null)
     }
     val coroutineScope = rememberCoroutineScope()
-
     var notesList = remember { mutableStateOf<List<Notes>>(emptyList()) }
-
     // Use a coroutine to load the notes from the database
     LaunchedEffect(Unit) {
         // Fetch notes in the IO dispatcher
@@ -110,18 +99,15 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             }
         }
     }
-
     if (selectedNoteToDelete != null) {
         AlertDialog(
             onDismissRequest = { selectedNoteToDelete = null },
-
             confirmButton = {
                 Button(onClick = {
                     coroutineScope.launch(Dispatchers.IO) {
 //                        val note = selectedNoteToDelete!!
 //                        dao.deleteNote(note)
 //                        selectedNoteToDelete =null
-
                         selectedNoteToDelete?.let {
                             dao.deleteNote(it)
                             selectedNoteToDelete = null
@@ -130,7 +116,6 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                 }) {
                     Text(text = "Yes")
                 }
-
             },
             dismissButton = {
                 Button(onClick = {
@@ -141,16 +126,8 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             },
             title = { Text("Conformation") },
             text = { Text("Are you sure you want to delete ${selectedNoteToDelete!!.tittle}? ") },
-
             )
     }
-    fun formatTimeStamp(timeStamp: Long): String {
-        val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
-        return simpleDateFormat.format(Date(timeStamp))
-
-    }
-
-
     // val themePreference = ThemePreference(context)
     var checked by remember { mutableStateOf(true) }
     Box(modifier = modifier.padding(top = 46.dp)) {
@@ -167,11 +144,8 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                         contentDescription = "Menu Icon",
                         tint = Color.Unspecified
                     )
-
                 }
-
                 Spacer(modifier = Modifier.weight(1f))
-
                 Image(
                     painter = painterResource(R.drawable.girl),
                     contentDescription = "profile",
@@ -180,11 +154,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                         .size(48.dp)
                 )
                 switchButton(themePreferences)
-
             }
             Spacer(
                 modifier = Modifier.padding(12.dp)
-
             )
             // FAVOURITES text Only
             Text(
@@ -203,51 +175,15 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                     .weight(1f),
                 content = {
                     items(notesList.value) { note ->
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .width(100.dp)
-                                .combinedClickable(onClick = {
-                                    navigator.push(AddUpdateNotesHere(note))
-                                }, onLongClick = {
-                                    selectedNoteToDelete = note
-                                })
-//                                .height((65 + (index % 5) * 30).dp)
-                                .background(
-                                    Color(0xFF7793D6), shape = RoundedCornerShape(12.dp)
-
-                                )
-
-                        ) {
-                            Column {
-
-                                Text(
-                                    text = formatTimeStamp(note.updatedAt),
-                                    modifier = Modifier.padding(8.dp),
-                                    fontSize = 12.sp,
-                                    fontFamily = VLRfontfamily,
-                                    color = Color.White,
-                                )
-                                Text(
-                                    text = note.tittle,
-                                    modifier = Modifier.padding(8.dp),
-                                    fontSize = 18.sp,
-                                    fontFamily = VLRfontfamily,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                val previewText = note.description.take(40) + "..."
-                                Text(
-                                    text = previewText,
-                                    modifier = Modifier.padding(8.dp),
-                                    fontSize = 16.sp,
-                                    fontFamily = VLRfontfamily,
-                                    color = Color.White
-                                )
-
+                        NoteCard(
+                            note = note,
+                            onClick = {
+                                navigator.push(AddUpdateNotesHere(note))
+                            },
+                            onLongClick = {
+                                selectedNoteToDelete = note
                             }
-                        }
-
+                        )
                     }
                 })
             // Floating Button
@@ -286,15 +222,14 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
 
         }
     }
-
-
 }
-
-
+fun formatTimeStamp(timeStamp: Long): String {
+    val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+    return simpleDateFormat.format(Date(timeStamp))
+}
 @Composable
 fun switchButton(themePreferences: ThemePreferences) {
     val currentTheme by themePreferences.defThemeMode
-
     Switch(
         checked = currentTheme == "dark",  // Is the current theme dark? If yes, switch is on (checked)
         onCheckedChange = { isChecked -> // When the user toggles the switch

@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.takenotes.R
 import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.data.Notes
-import com.example.takenotes.R
 import com.example.takenotes.ui.screens.home.VLRfontfamily
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -59,9 +59,6 @@ data class AddUpdateNotesHere(
 
     }
 }
-
-suspend fun somecode(){}
-
 @Composable
 fun EditNotes(modifier: Modifier = Modifier,
               notes: Notes?
