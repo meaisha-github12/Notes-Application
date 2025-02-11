@@ -62,10 +62,8 @@ class HomeScreen(val themePreferences: ThemePreferences) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
         Scaffold(
             modifier = Modifier.fillMaxSize(
-
             )
         ) { paddingValues ->
 

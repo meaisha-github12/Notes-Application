@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -15,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.VLRfontfamily
 import com.example.takenotes.ui.screens.home.getRelativeTime
@@ -29,7 +32,7 @@ fun NoteCard(
 ) {
     Box(
         modifier = modifier
-            .padding(8.dp)
+            .padding(12.dp)
             .width(100.dp)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
 //            .combinedClickable(onClick = {
@@ -43,15 +46,22 @@ fun NoteCard(
             )
     ) {
         Column {
+            Row {
 
-            Text(
-                text = note.tittle,
-                modifier = Modifier.padding(8.dp),
-                fontSize = 18.sp,
-                fontFamily = VLRfontfamily,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
+
+                Text(
+                    text = note.tittle,
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 18.sp,
+                    fontFamily = VLRfontfamily,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+                if(note.imageUrl != null)
+                {
+                    AsyncImage(model = note.imageUrl, contentDescription = "", modifier = Modifier.padding(4.dp).size(70.dp))
+                }
+            }
             val previewText = note.description.take(40) + "..."
             Text(
                 text = previewText,

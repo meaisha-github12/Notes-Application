@@ -78,6 +78,8 @@ data class AddUpdateNotesHere(
 fun EditNotes(
     modifier: Modifier = Modifier, notes: Notes?
 ) {
+    //Parent (EditNotes) owns pickedImgUri (the selected image URI).
+    // this updates time to time
     var pickedImgUri by remember { mutableStateOf<Uri?>(null) }
     val pickMedia = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -86,7 +88,6 @@ fun EditNotes(
             pickedImgUri = uri
         }
     }
-
     val navigator = LocalNavigator.currentOrThrow
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -96,8 +97,6 @@ fun EditNotes(
     val body = remember {
         mutableStateOf(notes?.description ?: "")
     }
-
-
     val dao = ApplicationClass.getApp(context).dao
     Box(modifier = Modifier.padding(top = 46.dp)) {
         Column(
@@ -172,16 +171,16 @@ fun EditNotes(
 
                 )
             }
-
+// conversion of uri to bitmap
             if(pickedImgUri == null) {
                 notes?.imageUrl?.let {
-                    Image(bitmap = byteArrayToBitmap(it).asImageBitmap(), contentDescription = "")
+                    Image(bitmap = byteArrayToBitmap(it).asImageBitmap(), contentDescription = "", modifier = Modifier.size(90.dp))
                 }
             }
-
             ImagePicker(
                 imageUri = pickedImgUri,
                 onImagePick = {
+
                     pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 }
             )
@@ -214,12 +213,13 @@ fun EditNotes(
                                         id = notes.id,
                                         tittle = title.value,
                                         description = body.value,
-                                        updatedAt = System.currentTimeMillis()
+                                        updatedAt = System.currentTimeMillis(),
+                                        imageUrl = notes.imageUrl
                                     )
                                     if(pickedImgUri != null){
-                                        uriToByteArray(pickedImgUri!!, context)?.let {
+                                        uriToByteArray(pickedImgUri!!, context)?.let {byteArray ->
                                             updatedNote = updatedNote.copy(
-                                                imageUrl = it
+                                                imageUrl = byteArray
                                             )
                                         }
                                     }
@@ -271,13 +271,14 @@ private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
 
 @Composable
 fun ImagePicker(
-    imageUri: Uri? = null,
-    onImagePick: () -> Unit,
+    //Child (ImagePicker) cannot change pickedImgUri directly
+    // hoisting the image uri
+    imageUri: Uri? = null,     // Receives the current image state.
+  //  Child calls onImagePick() to ask the parent to pick an image.
+
+onImagePick: () -> Unit,   // Receives a callback to launch the gallery.
 ) {
-
 // img picking code
-
-
     Column {
         // UI
         imageUri?.let { uri ->
@@ -288,8 +289,6 @@ fun ImagePicker(
         Button(onClick = onImagePick) {
             Text("Pick an Image")
         }
-
-
     }
 }
 
