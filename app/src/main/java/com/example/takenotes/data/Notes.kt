@@ -1,5 +1,6 @@
 package com.example.takenotes.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,7 +9,9 @@ data class Notes(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     val tittle: String,
     val description: String,
-    val updatedAt: Long = System.currentTimeMillis()
+    val updatedAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    val imageUrl: ByteArray? = null,
 
 
 )

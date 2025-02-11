@@ -82,5 +82,6 @@ dependencies {
     implementation(libs.androidx.room.runtime) // Room Runtime
     implementation(libs.androidx.room.ktx) // Kotlin Extensions
     ksp(libs.androidx.room.compiler) // KSP Compiler instead of KAPT
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
 }

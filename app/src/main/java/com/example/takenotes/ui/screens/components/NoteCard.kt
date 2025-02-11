@@ -43,13 +43,7 @@ fun NoteCard(
             )
     ) {
         Column {
-            Text(
-                text = getRelativeTime(note.updatedAt),
-                modifier = Modifier.padding(8.dp),
-                fontSize = 12.sp,
-                fontFamily = VLRfontfamily,
-                color = Color.White,
-            )
+
             Text(
                 text = note.tittle,
                 modifier = Modifier.padding(8.dp),
@@ -65,6 +59,13 @@ fun NoteCard(
                 fontSize = 16.sp,
                 fontFamily = VLRfontfamily,
                 color = Color.White
+            )
+            Text(
+                text = getRelativeTime(note.updatedAt),
+                modifier = Modifier.padding(8.dp),
+                fontSize = 12.sp,
+                fontFamily = VLRfontfamily,
+                color = Color.White,
             )
         }
     }

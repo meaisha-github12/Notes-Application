@@ -77,6 +77,7 @@ class HomeScreen(val themePreferences: ThemePreferences) : Screen {
 }
 
 val VLRfontfamily = FontFamily(Font(R.font.varelaroundregular))
+
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -125,7 +126,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             },
             title = { Text("Conformation") },
             text = { Text("Are you sure you want to delete ${selectedNoteToDelete!!.tittle}? ") },
-            )
+        )
     }
     // val themePreference = ThemePreference(context)
     var checked by remember { mutableStateOf(true) }
@@ -222,16 +223,17 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
         }
     }
 }
+
 //fun formatTimeStamp(timeStamp: Long): String {
 //    val simpleDateFormat = java.text.SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
 //    return simpleDateFormat.format(Date(timeStamp))
 //}
-fun getRelativeTime(timeStamp: Long):String
-{
-    return DateUtils.getRelativeTimeSpanString(timeStamp,
+fun getRelativeTime(timeStamp: Long): String {
+    return DateUtils.getRelativeTimeSpanString(
+        timeStamp,
         System.currentTimeMillis(),
         DateUtils.SECOND_IN_MILLIS,
-        ).toString()
+    ).toString()
 }
 
 @Composable
