@@ -5,6 +5,7 @@ import android.text.format.DateUtils
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -70,6 +72,7 @@ class HomeScreen(val themePreferences: ThemePreferences) : Screen {
             HomeView(
                 modifier = Modifier.padding(paddingValues), themePreferences = themePreferences
             )
+
         }
     }
 }
@@ -128,7 +131,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
     }
     // val themePreference = ThemePreference(context)
     var checked by remember { mutableStateOf(true) }
-    Box(modifier = modifier.padding(top = 46.dp)) {
+    Box(modifier = modifier.padding(top = 12.dp)) {
         Column(Modifier.padding(12.dp)) {
             // Top bar with menu icon and profile picture
             Row(
@@ -156,9 +159,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             Spacer(
                 modifier = Modifier.padding(12.dp)
             )
-            // FAVOURITES text Only
+//            // FAVOURITES text Only
             Text(
-                "Favourites",
+                "Notes",
                 color = Color(0xFF92B0F8),
                 fontFamily = VLRfontfamily,
                 fontSize = 24.sp,
@@ -217,7 +220,7 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                     }
                 }
             }
-
+            Footer()
         }
     }
 }
@@ -248,4 +251,61 @@ fun switchButton(themePreferences: ThemePreferences) {
             .padding(4.dp)
             .clip(CircleShape),
     )
+}
+
+@Composable
+fun Footer() {
+    val footerState = remember { mutableStateOf(FooterContent.Home) }
+    Box()
+    {
+        when(footerState.value)
+        {
+            FooterContent.Home -> {
+
+            }
+            FooterContent.Favourites -> {}
+            FooterContent.Setting -> {}
+        }
+
+    }
+    Row(
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color(0xA97793D6),
+                shape = RoundedCornerShape(12.dp),
+            )
+            .padding(4.dp)
+    ) {
+        FooterContent.entries.forEach() { fc: FooterContent ->
+            val selectedOption = fc == footerState.value
+            val containerColor = if (selectedOption) Color(0xFF7793D6) else Color.Transparent
+            val contentColor = if (selectedOption) Color.White else Color.Black
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = containerColor,
+                    contentColor = contentColor
+                ),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(),
+                onClick = {
+                    footerState.value = fc
+
+                }) {
+                Text(
+                    text = fc.name,
+                    fontFamily = VLRfontfamily,
+                    fontSize = 16.sp
+                )
+
+            }
+
+        }
+
+    }
+}
+
+enum class FooterContent {
+    Home, Favourites, Setting
 }

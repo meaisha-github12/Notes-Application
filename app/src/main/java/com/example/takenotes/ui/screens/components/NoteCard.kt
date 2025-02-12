@@ -1,18 +1,21 @@
 package com.example.takenotes.ui.screens.components
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,23 +48,35 @@ fun NoteCard(
                 color, shape = RoundedCornerShape(12.dp)
             )
     ) {
-        Column {
-            Row {
+        Column(
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(4.dp)
+            ) {
 
+                if (note.imageUrl != null) {
+                    AsyncImage(
+                        model = note.imageUrl,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .size(100.dp),
+                        contentScale = ContentScale.Crop
+                    )
 
-                Text(
-                    text = note.tittle,
-                    modifier = Modifier.padding(8.dp),
-                    fontSize = 18.sp,
-                    fontFamily = VLRfontfamily,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-                if(note.imageUrl != null)
-                {
-                    AsyncImage(model = note.imageUrl, contentDescription = "", modifier = Modifier.padding(4.dp).size(70.dp))
                 }
+
             }
+            Text(
+                text = note.tittle,
+                modifier = Modifier.padding(8.dp),
+                fontSize = 18.sp,
+                fontFamily = VLRfontfamily,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
             val previewText = note.description.take(40) + "..."
             Text(
                 text = previewText,
@@ -80,6 +95,7 @@ fun NoteCard(
         }
     }
 }
+
 @Preview
 @Composable
 fun NotePreview() {
@@ -90,6 +106,7 @@ fun NotePreview() {
         updatedAt = System.currentTimeMillis(),
     ), onClick = {}, onLongClick = {})
 }
+
 @Preview
 @Composable
 fun NotePreview2() {

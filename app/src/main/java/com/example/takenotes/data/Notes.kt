@@ -9,6 +9,7 @@ data class Notes(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     val tittle: String,
     val description: String,
+    val favourite: Boolean = false,
     val updatedAt: Long = System.currentTimeMillis(),
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     val imageUrl: ByteArray? = null,

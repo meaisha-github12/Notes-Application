@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.takenotes.core.ApplicationClass
@@ -18,6 +20,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,22 +36,33 @@ class MainActivity : ComponentActivity() {
         }
 
         themePreferences = ThemePreferences(this)
+
+        // Ensure savedData() runs correctly
+        lifecycleScope.launch {
+            themePreferences.savedData()
+        }
+
         enableEdgeToEdge()
-        themePreferences.savedData()
+
         setContent {
             val currentTheme = themePreferences.defThemeMode.value
 
             TakeNotesTheme(
                 darkTheme = when (currentTheme) {
-                    "light" -> false // If the saved theme is "light", set darkTheme to false (light mode)
-                    "dark" -> true        // If the saved theme is "dark", set darkTheme to true (dark mode)
-                    else -> isSystemInDarkTheme() // If no saved preference, fall back to the system theme
+                    "light" -> false
+                    "dark" -> true
+                    else -> isSystemInDarkTheme()
                 }
             ) {
                 Navigator(HomeScreen(themePreferences))
+
             }
         }
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
 
+}

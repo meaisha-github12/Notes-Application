@@ -151,7 +151,8 @@ fun EditNotes(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                OutlinedTextField(value = body.value,
+                OutlinedTextField(
+                    value = body.value,
                     onValueChange = { newValue: String ->
                         body.value = newValue
                     },
@@ -172,9 +173,13 @@ fun EditNotes(
                 )
             }
 // conversion of uri to bitmap
-            if(pickedImgUri == null) {
+            if (pickedImgUri == null) {
                 notes?.imageUrl?.let {
-                    Image(bitmap = byteArrayToBitmap(it).asImageBitmap(), contentDescription = "", modifier = Modifier.size(90.dp))
+                    Image(
+                        bitmap = byteArrayToBitmap(it).asImageBitmap(),
+                        contentDescription = "",
+                        modifier = Modifier.size(150.dp)
+                    )
                 }
             }
             ImagePicker(
@@ -205,8 +210,13 @@ fun EditNotes(
                                         Notes(
                                             tittle = title.value,
                                             description = body.value,
-                                            imageUrl = pickedImgUri?.let { uriToByteArray(it, context) }
-                                            )
+                                            imageUrl = pickedImgUri?.let {
+                                                uriToByteArray(
+                                                    it,
+                                                    context
+                                                )
+                                            }
+                                        )
                                     )
                                 } else {
                                     var updatedNote = Notes(
@@ -216,8 +226,8 @@ fun EditNotes(
                                         updatedAt = System.currentTimeMillis(),
                                         imageUrl = notes.imageUrl
                                     )
-                                    if(pickedImgUri != null){
-                                        uriToByteArray(pickedImgUri!!, context)?.let {byteArray ->
+                                    if (pickedImgUri != null) {
+                                        uriToByteArray(pickedImgUri!!, context)?.let { byteArray ->
                                             updatedNote = updatedNote.copy(
                                                 imageUrl = byteArray
                                             )
@@ -250,7 +260,8 @@ fun EditNotes(
 fun uriToByteArray(uri: Uri, context: Context): ByteArray? {
     //context Needed to access contentResolver to get the image data.
     // contentResolver.openInputStream(uri) opens a stream to read the image file from storage.
-    return try {8
+    return try {
+        8
         val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
         //converts the image data into a Bitmap.
         val bitmap = BitmapFactory.decodeStream(inputStream)
@@ -274,9 +285,9 @@ fun ImagePicker(
     //Child (ImagePicker) cannot change pickedImgUri directly
     // hoisting the image uri
     imageUri: Uri? = null,     // Receives the current image state.
-  //  Child calls onImagePick() to ask the parent to pick an image.
+    //  Child calls onImagePick() to ask the parent to pick an image.
 
-onImagePick: () -> Unit,   // Receives a callback to launch the gallery.
+    onImagePick: () -> Unit,   // Receives a callback to launch the gallery.
 ) {
 // img picking code
     Column {
