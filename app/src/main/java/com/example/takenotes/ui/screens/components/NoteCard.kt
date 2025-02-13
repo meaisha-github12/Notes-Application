@@ -10,20 +10,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.takenotes.R
+import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.VLRfontfamily
 import com.example.takenotes.ui.screens.home.getRelativeTime
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,6 +41,9 @@ fun NoteCard(
     onLongClick: () -> Unit,
     color: Color = Color(0xFF7793D6),
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val dao = ApplicationClass.getApp(LocalContext.current).dao
+  //  var isFavourite by remember { mutableStateOf(note.favourite)}
     Box(
         modifier = modifier
             .padding(12.dp)
@@ -68,6 +79,27 @@ fun NoteCard(
 
                 }
 
+            }
+            IconButton(onClick = {
+                note.favourite =! note.favourite
+                // Launch a coroutine to update the note in the database.
+                coroutineScope.launch {
+                    dao.updateNote(note)
+                }
+
+            }) {
+                if(note.favourite)
+                {
+                    Icon(painter = painterResource(R.drawable.filledfav), contentDescription = "Favourite",
+                        tint = Color.Unspecified
+                    )
+                }
+                else{
+
+                    Icon(painter = painterResource(R.drawable.fav,), contentDescription ="Not favourite",
+                        tint = Color.Unspecified
+                    )
+                }
             }
             Text(
                 text = note.tittle,

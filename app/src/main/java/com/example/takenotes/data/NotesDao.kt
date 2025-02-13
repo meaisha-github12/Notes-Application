@@ -19,9 +19,13 @@ interface NotesDao {
     suspend fun getAllNotes(): List<Notes>
 
     @Query("SELECT * FROM notes ORDER BY updatedAt DESC")
-    fun getAllNotesFlow(): Flow<List<Notes>>
+     fun getAllNotesFlow(): Flow<List<Notes>>
+
+    @Query("Update notes SET favourite = :isFavourite where id = :noteId")
+    suspend fun updateFavouritesNotes(noteId: Long, isFavourite: Boolean)
 
     @Update
     suspend fun updateNote(note: Notes)
+
 
 }
