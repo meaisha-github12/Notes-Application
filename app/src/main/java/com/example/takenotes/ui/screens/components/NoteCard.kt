@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -80,27 +81,7 @@ fun NoteCard(
                 }
 
             }
-            IconButton(onClick = {
-                note.favourite =! note.favourite
-                // Launch a coroutine to update the note in the database.
-                coroutineScope.launch {
-                    dao.updateNote(note)
-                }
 
-            }) {
-                if(note.favourite)
-                {
-                    Icon(painter = painterResource(R.drawable.filledfav), contentDescription = "Favourite",
-                        tint = Color.Unspecified
-                    )
-                }
-                else{
-
-                    Icon(painter = painterResource(R.drawable.fav,), contentDescription ="Not favourite",
-                        tint = Color.Unspecified
-                    )
-                }
-            }
             Text(
                 text = note.tittle,
                 modifier = Modifier.padding(8.dp),
@@ -117,6 +98,7 @@ fun NoteCard(
                 fontFamily = VLRfontfamily,
                 color = Color.White
             )
+            Row( modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = getRelativeTime(note.updatedAt),
                 modifier = Modifier.padding(8.dp),
@@ -124,6 +106,29 @@ fun NoteCard(
                 fontFamily = VLRfontfamily,
                 color = Color.White,
             )
+            IconButton(onClick = {
+                note.favourite =! note.favourite
+                // Launch a coroutine to update the note in the database.
+                coroutineScope.launch {
+                    dao.updateNote(note)
+                }
+
+            }) {
+                if(note.favourite)
+                {
+                    Icon(painter = painterResource(R.drawable.filledfav), contentDescription = "Favourite",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                else{
+
+                    Icon(painter = painterResource(R.drawable.fav,), contentDescription ="Not favourite",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }}
         }
     }
 }
