@@ -27,5 +27,8 @@ interface NotesDao {
     @Update
     suspend fun updateNote(note: Notes)
 
+    @Query("SELECT * FROM notes WHERE favourite = 1")
+    fun getFavouritesNotes(): Flow<List<Notes>>
+
 
 }
