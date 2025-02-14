@@ -17,15 +17,11 @@ import com.example.takenotes.ui.theme.TakeNotesTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val dao = ApplicationClass.getApp(this).dao
-
         lifecycleScope.launch(Dispatchers.IO) {
             dao.getAllNotesFlow().collect { notes ->
                 withContext(Dispatchers.Main) {
@@ -34,19 +30,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
         themePreferences = ThemePreferences(this)
-
         // Ensure savedData() runs correctly
         lifecycleScope.launch {
             themePreferences.savedData()
         }
-
         enableEdgeToEdge()
-
         setContent {
             val currentTheme = themePreferences.defThemeMode.value
-
             TakeNotesTheme(
                 darkTheme = when (currentTheme) {
                     "light" -> false
@@ -55,14 +46,11 @@ class MainActivity : ComponentActivity() {
                 }
             ) {
                 Navigator(HomeScreen(themePreferences))
-
             }
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-
 }

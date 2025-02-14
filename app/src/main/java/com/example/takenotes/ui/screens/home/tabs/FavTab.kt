@@ -57,6 +57,7 @@ fun FavTab(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.padding(12.dp))
             //            // FAVOURITES text Only
             Text(
+//                stringResource(id = R.string.hello_world),
                 "Favourites",
                 color = Color(0xFF92B0F8),
                 fontFamily = VLRfontfamily,
@@ -72,6 +73,7 @@ fun FavTab(modifier: Modifier = Modifier) {
                 NoteCard(note = note,
                     onClick = {
                    navigator.push(AddUpdateNotesHere(note))
+
                 }, onLongClick =
                     {
                     }

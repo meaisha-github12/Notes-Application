@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,7 +71,7 @@ val VLRfontfamily = FontFamily(Font(R.font.varelaroundregular))
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) {
-    val footerState = remember { mutableStateOf(FooterContent.Home) }
+    val footerState = rememberSaveable { mutableStateOf(FooterContent.Home) }
     val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao

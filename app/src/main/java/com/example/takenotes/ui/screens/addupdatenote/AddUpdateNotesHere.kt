@@ -224,7 +224,8 @@ fun EditNotes(
                                         tittle = title.value,
                                         description = body.value,
                                         updatedAt = System.currentTimeMillis(),
-                                        imageUrl = notes.imageUrl
+                                        imageUrl = notes.imageUrl,
+                                        favourite = notes.favourite
                                     )
                                     if (pickedImgUri != null) {
                                         uriToByteArray(pickedImgUri!!, context)?.let { byteArray ->
@@ -276,7 +277,7 @@ fun uriToByteArray(uri: Uri, context: Context): ByteArray? {
     }
 }
 
-private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
     return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 }
 
