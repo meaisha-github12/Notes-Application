@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,8 +100,14 @@ fun HomeTab(
             IconButton(modifier = Modifier.size(48.dp), onClick = {
                 // Handle the click event here
             }) {
+//                Icon(
+//                    painter = painterResource(R.drawable.menuicon),
+//                    contentDescription = "Menu Icon",
+//                    tint = Color.Unspecified
+//                )
+
                 Icon(
-                    painter = painterResource(R.drawable.menuicon),
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Menu Icon",
                     tint = Color.Unspecified
                 )
@@ -118,7 +127,8 @@ fun HomeTab(
         )
         //            // FAVOURITES text Only
         Text(
-            "Notes",
+            //////////////////////////////
+            stringResource(id = R.string.hello_world),
             color = Color(0xFF92B0F8),
             fontFamily = VLRfontfamily,
             fontSize = 24.sp,

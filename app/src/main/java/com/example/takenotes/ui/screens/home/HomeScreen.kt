@@ -44,6 +44,7 @@ import com.example.takenotes.core.ThemePreferences
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.tabs.FavTab
 import com.example.takenotes.ui.screens.home.tabs.HomeTab
+import com.example.takenotes.ui.screens.settings.settingsTab
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -103,7 +104,9 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                     FooterContent.Favourites -> {
                         FavTab()
                     }
-                    FooterContent.Setting -> {}
+                    FooterContent.Setting -> {
+                      settingsTab(themePreferences = themePreferences)
+                    }
                 }
             }
 

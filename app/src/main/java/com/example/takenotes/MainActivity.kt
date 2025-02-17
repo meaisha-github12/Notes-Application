@@ -12,15 +12,20 @@ import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.core.ThemePreferences
+import com.example.takenotes.core.updateLocale
 import com.example.takenotes.ui.screens.home.HomeScreen
 import com.example.takenotes.ui.theme.TakeNotesTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+            val themePreferences = ThemePreferences(this)
+            themePreferences.savedLanguage()
+        updateLocale(this, themePreferences.defLanguage.value)
         val dao = ApplicationClass.getApp(this).dao
         lifecycleScope.launch(Dispatchers.IO) {
             dao.getAllNotesFlow().collect { notes ->
@@ -30,7 +35,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        themePreferences = ThemePreferences(this)
         // Ensure savedData() runs correctly
         lifecycleScope.launch {
             themePreferences.savedData()
@@ -50,6 +54,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

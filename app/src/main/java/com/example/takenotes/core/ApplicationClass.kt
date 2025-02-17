@@ -16,6 +16,8 @@ class ApplicationClass : Application() {
         //This themePrefs object can now be used to save or retrieve
         // the theme preference from SharedPreferences.
         themePrefs = ThemePreferences(this.applicationContext)
+        themePrefs.savedLanguage()
+            // calling updateLocale at App Startup
     }
 
     // for DB
