@@ -1,6 +1,5 @@
 package com.example.takenotes.ui.screens.home.tabs
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,8 +11,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
@@ -106,20 +103,20 @@ fun HomeTab(
 //                    tint = Color.Unspecified
 //                )
 
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Menu Icon",
-                    tint = Color.Unspecified
-                )
+//                Icon(
+//                    Icons.AutoMirrored.Filled.ArrowBack,
+//                    contentDescription = "Menu Icon",
+//                    tint = Color.Unspecified
+//                )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(R.drawable.girl),
-                contentDescription = "profile",
-                modifier = Modifier
-                    .padding(end = 32.dp)
-                    .size(48.dp)
-            )
+//            Image(
+//                painter = painterResource(R.drawable.girl),
+//                contentDescription = "profile",
+//                modifier = Modifier
+//                    .padding(end = 32.dp)
+//                    .size(48.dp)
+//            )
             switchButton(themePreferences)
         }
         Spacer(
