@@ -3,7 +3,10 @@ package com.example.takenotes.ui.screens.settings
 import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -46,16 +49,26 @@ fun settingsTab(themePreferences: ThemePreferences) {
                 fontFamily = VLRfontfamily,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 28.dp)
+                modifier = Modifier.padding(horizontal = 18.dp)
             )
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    painter = painterResource(R.drawable.language),
-                    contentDescription = "Language Icon (more Options)",
-                    tint = Color.Unspecified
+            Spacer(modifier = Modifier.padding(12.dp))
+            Row(modifier = Modifier.padding(horizontal = 18.dp), )
+            {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        painter = painterResource(R.drawable.language),
+                        contentDescription = "Language Icon (more Options)",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Text("Languages",
+                    fontFamily = VLRfontfamily,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding( 12.dp),    color = Color(0xFF92B0F8),
                 )
-
             }
+
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 DropdownMenuItem(text = { Text("Urdu") }, onClick = {
                     themePreferences.savingLanguage("ur")
