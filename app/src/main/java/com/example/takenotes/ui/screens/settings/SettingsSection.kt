@@ -73,17 +73,17 @@ fun settingsTab(themePreferences: ThemePreferences) {
                 DropdownMenuItem(text = { Text("Urdu") }, onClick = {
                     themePreferences.savingLanguage("ur")
                     updateLocale(context, "ur")
-                    restartApp(context, activity)
+                    restartApp(activity)
                 })
                 DropdownMenuItem(text = { Text("English") }, onClick = {
                     themePreferences.savingLanguage("en")
                     updateLocale(context, "en")
-                    restartApp(context, activity)
+                    restartApp(activity)
                 })
                 DropdownMenuItem(text = { Text("Arabic") }, onClick = {
                     themePreferences.savingLanguage("ar")
                     updateLocale(context, "ar")
-                    restartApp(context, activity)
+                    restartApp(activity)
                 })
 
             }

@@ -19,10 +19,10 @@ fun updateLocale(context: Context, languageCode: String) {
     context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
 
 }
-fun restartApp(context: Context, activity: Activity?) {
-    val intent = Intent(context, MainActivity::class.java)
+fun restartApp(activity: Activity?) {
+    val intent = Intent(activity, MainActivity::class.java)
     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-    context.startActivity(intent)
+    activity?.startActivity(intent)
     activity?.finish() // Only finish if activity is valid
 
 
