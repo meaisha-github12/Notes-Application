@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +56,7 @@ import com.example.takenotes.R
 import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.VLRfontfamily
+import com.example.takenotes.ui.theme.ColorPickerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -81,6 +85,11 @@ fun EditNotes(
     //Parent (EditNotes) owns pickedImgUri (the selected image URI).
     // this updates time to time
     var pickedImgUri by remember { mutableStateOf<Uri?>(null) }
+    var showColorPicker by remember { mutableStateOf(false) }
+    var selectedColor by remember {
+        mutableStateOf(Color.White)
+    }
+    selectedColor.luminance()
     val pickMedia = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -98,7 +107,9 @@ fun EditNotes(
         mutableStateOf(notes?.description ?: "")
     }
     val dao = ApplicationClass.getApp(context).dao
-    Box(modifier = Modifier.padding(top = 46.dp)) {
+    Box(modifier = Modifier
+        .background(selectedColor)
+        .padding(top = 46.dp)) {
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
@@ -117,6 +128,18 @@ fun EditNotes(
                         tint = Color.Unspecified
                     )
 
+                }
+
+                IconButton(
+                    onClick = {
+                        showColorPicker = true},
+//                    modifier = Modifier.align(Alignment.End)
+
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
+                        contentDescription = "Pick Color", tint = Color.Unspecified
+                    )
                 }
                 Spacer(modifier = Modifier.padding(horizontal = 12.dp))
                 Text(
@@ -182,6 +205,17 @@ fun EditNotes(
                     )
                 }
             }
+            if(showColorPicker){
+                ColorPickerDialog(
+                    onColorChange = { newColor ->
+                        showColorPicker = false
+                        selectedColor = newColor
+
+                    },
+                    onDismiss = { showColorPicker = false }
+                )
+
+            }
             ImagePicker(
                 imageUri = pickedImgUri,
                 onImagePick = {
@@ -210,6 +244,7 @@ fun EditNotes(
                                         Notes(
                                             tittle = title.value,
                                             description = body.value,
+                                            colors = selectedColor.toArgb(),
                                             imageUrl = pickedImgUri?.let {
                                                 uriToByteArray(
                                                     it,
@@ -225,7 +260,8 @@ fun EditNotes(
                                         description = body.value,
                                         updatedAt = System.currentTimeMillis(),
                                         imageUrl = notes.imageUrl,
-                                        favourite = notes.favourite
+                                        favourite = notes.favourite,
+                                        colors = selectedColor.toArgb()
                                     )
                                     if (pickedImgUri != null) {
                                         uriToByteArray(pickedImgUri!!, context)?.let { byteArray ->

@@ -15,7 +15,7 @@ class ApplicationClass : Application() {
         // Initialize themePrefs safely
         //This themePrefs object can now be used to save or retrieve
         // the theme preference from SharedPreferences.
-        themePrefs = ThemePreferences(this.applicationContext)
+        themePrefs = ThemePreferences.getInstance(this.applicationContext)
         themePrefs.savedLanguage()
             // calling updateLocale at App Startup
     }

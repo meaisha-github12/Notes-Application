@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
-class ThemePreferences(context: Context) {
+class ThemePreferences private constructor(context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE)
 
@@ -14,6 +14,10 @@ class ThemePreferences(context: Context) {
         private const val PREFS_FILE_NAME = "MySharedPrefs"
         private const val THEME_KEY = "prefsKey"
         private const val LANGUAGE_KEY = "languagePrefsKey"
+
+        fun getInstance(context: Context): ThemePreferences {
+            return ThemePreferences(context)
+        }
     }
 
     //val defThemeMode = mutableStateOf("light")

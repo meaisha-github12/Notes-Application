@@ -1,4 +1,5 @@
 package com.example.takenotes.ui.screens.components
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -6,7 +7,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.takenotes.R
@@ -34,34 +36,31 @@ import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.addupdatenote.byteArrayToBitmap
 import com.example.takenotes.ui.screens.home.VLRfontfamily
 import com.example.takenotes.ui.screens.home.getRelativeTime
+import com.example.takenotes.utils.foregroundColor
 import kotlinx.coroutines.launch
 
 
 val bitmapCache = hashMapOf<Long, ImageBitmap>()
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteCard(
-    modifier: Modifier = Modifier, note: Notes,
+    note: Notes,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    color: Color = Color(0xFF7793D6),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val dao = ApplicationClass.getApp(LocalContext.current).dao
-  //  var isFavourite by remember { mutableStateOf(note.favourite)}
+    //  var isFavourite by remember { mutableStateOf(note.favourite)}
+    val bgColor = Color(note.colors)
     Box(
         modifier = modifier
             .padding(12.dp)
             .width(100.dp)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-//            .combinedClickable(onClick = {
-//                navigator.push(AddUpdateNotesHere(note))
-//            }, onLongClick = {
-//                selectedNoteToDelete = note
-//            })
-//                                .height((65 + (index % 5) * 30).dp)
             .background(
-                color, shape = RoundedCornerShape(12.dp)
+                bgColor, shape = RoundedCornerShape(12.dp)
             )
     ) {
         Column(
@@ -73,9 +72,10 @@ fun NoteCard(
             ) {
                 if (note.imageUrl != null) {
                     Image(
-                        bitmapCache[note.id] ?: byteArrayToBitmap(note.imageUrl).asImageBitmap().also {
-                            bitmapCache[note.id] = it
-                        },
+                        bitmapCache[note.id] ?: byteArrayToBitmap(note.imageUrl).asImageBitmap()
+                            .also {
+                                bitmapCache[note.id] = it
+                            },
                         contentDescription = "",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -84,76 +84,86 @@ fun NoteCard(
                     )
                 }
             }
+
             Text(
                 text = note.tittle,
                 modifier = Modifier.padding(8.dp),
                 fontSize = 18.sp,
                 fontFamily = VLRfontfamily,
-                color = Color.White,
+                color = bgColor.foregroundColor(),
                 fontWeight = FontWeight.Bold
             )
+//            IconButton(
+//                onClick = {
+//                    showColorPicker = true},
+//                    modifier = Modifier.align(Alignment.End)
+//
+//            ) {
+//                Icon(
+//                    painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
+//                    contentDescription = "Pick Color", tint = Color.Unspecified
+//                )
+//            }
             val previewText = note.description.take(40) + "..."
             Text(
                 text = previewText,
                 modifier = Modifier.padding(8.dp),
                 fontSize = 16.sp,
                 fontFamily = VLRfontfamily,
-                color = Color.White
+                color = bgColor.foregroundColor(),
             )
-            Row( modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = getRelativeTime(note.updatedAt),
-                modifier = Modifier.padding(8.dp),
-                fontSize = 12.sp,
-                fontFamily = VLRfontfamily,
-                color = Color.White,
-            )
-            IconButton(onClick = {
-                note.favourite =! note.favourite
-                // Launch a coroutine to update the note in the database.
-                coroutineScope.launch {
-                    dao.updateNote(note)
-                }
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = getRelativeTime(note.updatedAt),
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 12.sp,
+                    fontFamily = VLRfontfamily,
+                    color = bgColor.foregroundColor(),
+                )
+                IconButton(onClick = {
+                    note.favourite = !note.favourite
+                    // Launch a coroutine to update the note in the database.
+                    coroutineScope.launch {
+                        dao.updateNote(note)
+                    }
 
-            }) {
-                if(note.favourite)
-                {
-                    Icon(painter = painterResource(R.drawable.filledfav), contentDescription = "Favourite",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-                else{
+                }) {
+                    if (note.favourite) {
+                        Icon(
+                            painter = painterResource(R.drawable.filledfav),
+                            contentDescription = "Favourite",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    } else {
 
-                    Icon(painter = painterResource(R.drawable.fav,), contentDescription ="Not favourite",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(18.dp)
-                    )
+                        Icon(
+                            painter = painterResource(R.drawable.fav),
+                            contentDescription = "Not favourite",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
-            }}
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            // Add Color Picker Row
+
         }
+        //Show Color Picker Dialog when button is clicked
+//        if(showColorPicker){
+//            ColorPickerDialog(
+//                noteId = note.id,
+//                onColorChange = { selectedColor ->
+//                    onColorChange(note.id , selectedColor.hashCode())
+//                    showColorPicker = false
+//
+//                },
+//                onDismiss = { showColorPicker = false }
+//            )
+//
+//        }
     }
 }
 
-@Preview
-@Composable
-fun NotePreview() {
-    NoteCard(note = Notes(
-        id = 123L,
-        tittle = "Note Title",
-        description = "Notes Description",
-        updatedAt = System.currentTimeMillis(),
-    ), onClick = {}, onLongClick = {})
-}
 
-@Preview
-@Composable
-fun NotePreview2() {
-    NoteCard(note = Notes(
-        id = 123L,
-        tittle = "Note Title3",
-        description = "Notes Description",
-        updatedAt = System.currentTimeMillis(),
-    ), onClick = {}, onLongClick = {}, color = Color.Red
-    )
-}

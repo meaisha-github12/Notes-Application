@@ -41,7 +41,6 @@ import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.addupdatenote.AddUpdateNotesHere
 import com.example.takenotes.ui.screens.components.NoteCard
 import com.example.takenotes.ui.screens.home.VLRfontfamily
-import com.example.takenotes.ui.screens.home.switchButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -97,27 +96,10 @@ fun HomeTab(
             IconButton(modifier = Modifier.size(48.dp), onClick = {
                 // Handle the click event here
             }) {
-//                Icon(
-//                    painter = painterResource(R.drawable.menuicon),
-//                    contentDescription = "Menu Icon",
-//                    tint = Color.Unspecified
-//                )
 
-//                Icon(
-//                    Icons.AutoMirrored.Filled.ArrowBack,
-//                    contentDescription = "Menu Icon",
-//                    tint = Color.Unspecified
-//                )
             }
             Spacer(modifier = Modifier.weight(1f))
-//            Image(
-//                painter = painterResource(R.drawable.girl),
-//                contentDescription = "profile",
-//                modifier = Modifier
-//                    .padding(end = 32.dp)
-//                    .size(48.dp)
-//            )
-            switchButton(themePreferences)
+
         }
         Spacer(
             modifier = Modifier.padding(12.dp)
@@ -148,6 +130,13 @@ fun HomeTab(
                         onLongClick = {
                             selectedNoteToDelete = note
                         }
+//                        onColorChange = {noteId, newColor ->
+//                            coroutineScope.launch{
+//                                dao.updateNotesColor(noteId, newColor)
+//                            }
+//
+//
+//                        }
                     )
                 }
             })

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.Navigator
+import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.core.ThemePreferences
 import com.example.takenotes.core.updateLocale
 import com.example.takenotes.ui.screens.home.HomeScreen
@@ -19,8 +20,8 @@ class MainActivity : ComponentActivity() {
     lateinit var themePreferences: ThemePreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-            val themePreferences = ThemePreferences(this)
-            themePreferences.savedLanguage()
+        val themePreferences = ApplicationClass.getApp(this).themePrefs
+        themePreferences.savedLanguage()
         updateLocale(this, themePreferences.defLanguage.value)
 
         // Ensure savedData() runs correctly

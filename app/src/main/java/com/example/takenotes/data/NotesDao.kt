@@ -29,6 +29,8 @@ interface NotesDao {
 
     @Query("SELECT * FROM notes WHERE favourite = 1")
     fun getFavouritesNotes(): Flow<List<Notes>>
-
+   //noteId: Int → The specific note whose color needs to be changed.
+    @Query("UPDATE notes SET colors = :newColor WHERE id = :notesId")
+    suspend fun updateNotesColor(notesId: kotlin.Long, newColor: Int)
 
 }

@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,28 +37,25 @@ import com.example.takenotes.ui.screens.home.VLRfontfamily
 
 @Composable
 fun FavTab(modifier: Modifier = Modifier) {
-    var selectedNoteToDelete by remember {mutableStateOf<Notes?>(null)}
+    var selectedNoteToDelete by remember { mutableStateOf<Notes?>(null) }
     val navigator = LocalNavigator.currentOrThrow
-    val FavouritesNotesFlow = ApplicationClass.getApp(LocalContext.current).dao.getFavouritesNotes()
-    val favouritesNotes by FavouritesNotesFlow.collectAsState(initial = emptyList())
-    Box(modifier = Modifier
-        .fillMaxSize())
-    {
-        Column() {
-            IconButton(modifier = Modifier.size(38.dp), onClick = {
+    val favouritesNotesFlow = ApplicationClass.getApp(LocalContext.current).dao.getFavouritesNotes()
+    val favouritesNotes by favouritesNotesFlow.collectAsState(initial = emptyList())
+    val dao = ApplicationClass.getApp(LocalContext.current).dao
+    val coroutineScope = rememberCoroutineScope()
 
-            }) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column {
+            IconButton(modifier = Modifier.size(38.dp), onClick = { }) {
                 Icon(
                     painter = painterResource(R.drawable.backarrow),
                     contentDescription = "Menu Icon",
                     tint = Color.Unspecified
                 )
-
             }
             Spacer(modifier = Modifier.padding(12.dp))
-            //            // FAVOURITES text Only
+
             Text(
-//                stringResource(id = R.string.hello_world),
                 "Favourites",
                 color = Color(0xFF92B0F8),
                 fontFamily = VLRfontfamily,
@@ -66,23 +64,19 @@ fun FavTab(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(horizontal = 28.dp)
             )
 
-   LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp), modifier = Modifier.weight(1f),
-       content = {
-           items(favouritesNotes)
-           {note ->
-                NoteCard(note = note,
-                    onClick = {
-                   navigator.push(AddUpdateNotesHere(note))
-
-                }, onLongClick =
-                    {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Adaptive(120.dp),
+                modifier = Modifier.weight(1f),
+                content = {
+                    items(favouritesNotes) { note ->
+                        NoteCard(
+                            note = note,
+                            onClick = { navigator.push(AddUpdateNotesHere(note)) },
+                            onLongClick = { /* Handle long click if needed */ }
+                        )
                     }
-                )
-
-
-           }
-
-       }
-       )}
+                }
+            )
+        }
     }
 }

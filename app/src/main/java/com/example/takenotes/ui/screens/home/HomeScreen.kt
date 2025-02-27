@@ -93,30 +93,31 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
         Column(Modifier.padding(12.dp)) {
             // Top bar with menu icon and profile picture
 
-            Box(modifier = Modifier.weight(1f)){
-                when(footerState.value){
+            Box(modifier = Modifier.weight(1f)) {
+                when (footerState.value) {
                     FooterContent.Home -> {
                         HomeTab(
                             themePreferences = themePreferences,
                             notesList = notesList,
                         )
                     }
+
                     FooterContent.Favourites -> {
                         FavTab()
                     }
+
                     FooterContent.Setting -> {
-                      settingsTab(themePreferences = themePreferences)
+                        settingsTab()
                     }
                 }
             }
 
-            Footer(footerState.value, onChange = {newFc ->
+            Footer(footerState.value, onChange = { newFc ->
                 footerState.value = newFc
             })
         }
     }
 }
-
 
 
 //fun formatTimeStamp(timeStamp: Long): String {
@@ -132,7 +133,7 @@ fun getRelativeTime(timeStamp: Long): String {
 }
 
 @Composable
-fun switchButton(themePreferences: ThemePreferences) {
+fun ThemeSwitchButton(themePreferences: ThemePreferences) {
     val currentTheme by themePreferences.defThemeMode
     Switch(
         checked = currentTheme == "dark",  // Is the current theme dark? If yes, switch is on (checked)
@@ -147,10 +148,32 @@ fun switchButton(themePreferences: ThemePreferences) {
     )
 }
 
+//@Composable
+//fun ThemeDropDown(themePreferences: ThemePreferences) {
+//    var expanded = remember { mutableStateOf(false) }
+//    Box(modifier = Modifier.padding()) {
+//        IconButton(onClick = { expanded.value = !expanded.value }) {
+//            Icon(painter = painterResource(R.drawable.theme), contentDescription = "Theme Icon", tint = Color.Unspecified)
+//        }
+//        DropdownMenu(expanded = expanded.value, onDismissRequest = { expanded.value = false }) {
+//            DropdownMenuItem(text = { Text("Dark") }, onClick = {
+//                themePreferences.savingData("dark")
+//                expanded.value = false
+//            })
+//            DropdownMenuItem(text = { Text("Light") }, onClick = {
+//                themePreferences.savingData("light")
+//                expanded.value = false
+//            })
+//            DropdownMenuItem(text = { Text("System") }, onClick = {
+//                themePreferences.savingData("system")
+//                expanded.value = false })
+//        }
+//    }
+//}
+
 @Composable
 fun Footer(
-    footerState: FooterContent,
-    onChange: (FooterContent) -> Unit = {}
+    footerState: FooterContent, onChange: (FooterContent) -> Unit = {}
 ) {
     Row(
 
@@ -166,11 +189,9 @@ fun Footer(
             val selectedOption = fc == footerState
             val containerColor = if (selectedOption) Color(0xFF7793D6) else Color.Transparent
             val contentColor = if (selectedOption) Color.White else Color.Black
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = containerColor,
-                    contentColor = contentColor
-                ),
+            Button(colors = ButtonDefaults.buttonColors(
+                containerColor = containerColor, contentColor = contentColor
+            ),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(),
                 onClick = {
@@ -178,9 +199,7 @@ fun Footer(
 
                 }) {
                 Text(
-                    text = fc.name,
-                    fontFamily = VLRfontfamily,
-                    fontSize = 16.sp
+                    text = fc.name, fontFamily = VLRfontfamily, fontSize = 16.sp
                 )
 
             }
