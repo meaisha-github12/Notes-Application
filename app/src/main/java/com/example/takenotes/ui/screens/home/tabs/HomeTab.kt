@@ -55,6 +55,10 @@ fun HomeTab(
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao
 
+    var selectedNotes by remember {
+        mutableStateOf<List<Notes>>(emptyList())
+    }
+
     var selectedNoteToDelete by remember {
         mutableStateOf<Notes?>(null)
     }
@@ -124,11 +128,20 @@ fun HomeTab(
                 items(notesList.value) { note ->
                     NoteCard(
                         note = note,
+                        selected = selectedNotes.contains(note),
                         onClick = {
-                            navigator.push(AddUpdateNotesHere(note))
+                            if(selectedNotes.isNotEmpty()){
+                                if(selectedNotes.contains(note)){
+                                    selectedNotes = selectedNotes
+                                }
+                                selectedNotes = selectedNotes + note
+                            } else {
+                                navigator.push(AddUpdateNotesHere(note))
+                            }
                         },
                         onLongClick = {
-                            selectedNoteToDelete = note
+                            selectedNotes = selectedNotes + note
+//                            selectedNoteToDelete = note
                         }
                     )
                 }

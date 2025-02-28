@@ -3,6 +3,7 @@ package com.example.takenotes.ui.screens.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ val bitmapCache = hashMapOf<Long, ImageBitmap>()
 fun NoteCard(
     note: Notes,
     modifier: Modifier = Modifier,
+    selected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
@@ -60,6 +62,11 @@ fun NoteCard(
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .background(
                 bgColor, shape = RoundedCornerShape(12.dp)
+            )
+            .border(
+                if (selected) 4.dp else 0.dp,
+                color = Color.Black
+//                shape = RoundedCornerShape(12.dp)
             )
     ) {
         Column(
