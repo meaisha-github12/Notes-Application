@@ -107,6 +107,19 @@ fun EditNotes(
         mutableStateOf(notes?.description ?: "")
     }
     val dao = ApplicationClass.getApp(context).dao
+
+    if(showColorPicker){
+        ColorPickerDialog(
+            onColorChange = { newColor ->
+                showColorPicker = false
+                selectedColor = newColor
+
+            },
+            onDismiss = { showColorPicker = false }
+        )
+
+    }
+
     Box(modifier = Modifier
         .background(selectedColor)
         .fillMaxSize()
@@ -204,17 +217,7 @@ fun EditNotes(
                     )
                 }
             }
-            if(showColorPicker){
-                ColorPickerDialog(
-                    onColorChange = { newColor ->
-                        showColorPicker = false
-                        selectedColor = newColor
 
-                    },
-                    onDismiss = { showColorPicker = false }
-                )
-
-            }
             ImagePicker(
                 imageUri = pickedImgUri,
                 onImagePick = {
