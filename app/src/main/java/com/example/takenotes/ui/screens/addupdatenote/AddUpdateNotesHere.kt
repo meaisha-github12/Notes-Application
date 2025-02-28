@@ -12,6 +12,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
@@ -56,6 +58,7 @@ import com.example.takenotes.R
 import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.VLRfontfamily
+import com.example.takenotes.ui.theme.BlueColor
 import com.example.takenotes.ui.theme.ColorPickerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -87,7 +90,7 @@ fun EditNotes(
     var pickedImgUri by remember { mutableStateOf<Uri?>(null) }
     var showColorPicker by remember { mutableStateOf(false) }
     var selectedColor by remember {
-        mutableStateOf(Color.White)
+        mutableStateOf(BlueColor)
     }
     selectedColor.luminance()
     val pickMedia = rememberLauncherForActivityResult(
@@ -121,7 +124,7 @@ fun EditNotes(
     }
 
     Box(modifier = Modifier
-        .background(selectedColor)
+//        .background(selectedColor)
         .fillMaxSize()
         .padding(top = 46.dp)) {
         Column(
@@ -144,15 +147,20 @@ fun EditNotes(
 
                 }
 
-                IconButton(
-                    onClick = {
-                        showColorPicker = true},
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
-                        contentDescription = "Pick Color", tint = Color.Unspecified
-                    )
-                }
+//                IconButton(
+//                    onClick = {
+//                        showColorPicker = true},
+//                ) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
+//                        contentDescription = "Pick Color", tint = Color.Unspecified
+//                    )
+//                }
+                Box(modifier = Modifier.size(28.dp).background(selectedColor, shape = CircleShape)
+                    .clickable {
+                        showColorPicker = true
+                    }
+                    ,)
                 Spacer(modifier = Modifier.padding(horizontal = 12.dp))
                 Text(
                     "Write Notes!",
