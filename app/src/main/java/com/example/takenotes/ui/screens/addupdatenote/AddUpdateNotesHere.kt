@@ -109,6 +109,7 @@ fun EditNotes(
     val dao = ApplicationClass.getApp(context).dao
     Box(modifier = Modifier
         .background(selectedColor)
+        .fillMaxSize()
         .padding(top = 46.dp)) {
         Column(
             modifier = Modifier
@@ -133,8 +134,6 @@ fun EditNotes(
                 IconButton(
                     onClick = {
                         showColorPicker = true},
-//                    modifier = Modifier.align(Alignment.End)
-
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
@@ -194,7 +193,7 @@ fun EditNotes(
                         .height(150.dp)
 
                 )
-            }
+            };
 // conversion of uri to bitmap
             if (pickedImgUri == null) {
                 notes?.imageUrl?.let {

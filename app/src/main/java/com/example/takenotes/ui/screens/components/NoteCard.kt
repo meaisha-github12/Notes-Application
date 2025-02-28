@@ -39,7 +39,6 @@ import com.example.takenotes.ui.screens.home.getRelativeTime
 import com.example.takenotes.utils.foregroundColor
 import kotlinx.coroutines.launch
 
-
 val bitmapCache = hashMapOf<Long, ImageBitmap>()
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -84,7 +83,6 @@ fun NoteCard(
                     )
                 }
             }
-
             Text(
                 text = note.tittle,
                 modifier = Modifier.padding(8.dp),
@@ -93,17 +91,6 @@ fun NoteCard(
                 color = bgColor.foregroundColor(),
                 fontWeight = FontWeight.Bold
             )
-//            IconButton(
-//                onClick = {
-//                    showColorPicker = true},
-//                    modifier = Modifier.align(Alignment.End)
-//
-//            ) {
-//                Icon(
-//                    painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
-//                    contentDescription = "Pick Color", tint = Color.Unspecified
-//                )
-//            }
             val previewText = note.description.take(40) + "..."
             Text(
                 text = previewText,

@@ -13,7 +13,7 @@ data class Notes(
     val description: String,
     var favourite: Boolean = false,
     val updatedAt: Long = System.currentTimeMillis(),
-    val colors : Int= BlueColor.toArgb(),
+    val colors : Int = BlueColor.toArgb(),
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     val imageUrl: ByteArray? = null,
 

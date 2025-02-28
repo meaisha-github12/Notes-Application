@@ -130,13 +130,6 @@ fun HomeTab(
                         onLongClick = {
                             selectedNoteToDelete = note
                         }
-//                        onColorChange = {noteId, newColor ->
-//                            coroutineScope.launch{
-//                                dao.updateNotesColor(noteId, newColor)
-//                            }
-//
-//
-//                        }
                     )
                 }
             })

@@ -17,10 +17,9 @@ import androidx.compose.ui.unit.dp
 // creating a Color Picker
 @Composable
 fun ColorPickerDialog(
-                       onDismiss: () -> Unit,
-                       onColorChange: (Color) -> Unit ) {
-    val listOfColor = listOf(Color.Red, Color.Gray, Color.Black, Color.Blue, Color.Green, Color.Yellow)
-
+    onDismiss: () -> Unit, onColorChange: (Color) -> Unit
+) {
+    val listOfColor = listOf(Color(0xFFE52020), Color(0xFFA8A196), Color.Black, Color(0xFF98D8EF), Color(0xFF5CB338),Color(0xFFFFEFC8), Color(0xFFE5D0AC), Color(0xFF66D2CE), Color(0xFF92B0F8))
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -28,15 +27,13 @@ fun ColorPickerDialog(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         listOfColor.forEach { color ->
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(color, CircleShape)
-                    .clickable {
-                        onColorChange(color)
-                        onDismiss()
-                    }
-            )
+            Box(modifier = Modifier
+                .size(40.dp)
+                .background(color, CircleShape)
+                .clickable {
+                    onColorChange(color)
+                    onDismiss()
+                })
         }
     }
 }
