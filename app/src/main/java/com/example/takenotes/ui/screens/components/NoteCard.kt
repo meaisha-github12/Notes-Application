@@ -64,10 +64,10 @@ fun NoteCard(
                 bgColor, shape = RoundedCornerShape(12.dp)
             )
             .border(
-                if (selected) 4.dp else 0.dp,
-                color = Color.Black
-//                shape = RoundedCornerShape(12.dp)
+                width = if (selected) 4.dp else 0.dp,  // No border when unselected
+                color = if (selected) Color.Black else Color.Transparent // Invisible border when unselected
             )
+
     ) {
         Column(
             modifier = Modifier.padding(4.dp)
@@ -115,10 +115,10 @@ fun NoteCard(
                     color = bgColor.foregroundColor(),
                 )
                 IconButton(onClick = {
-                    note.favourite = !note.favourite
                     // Launch a coroutine to update the note in the database.
                     coroutineScope.launch {
-                        dao.updateNote(note)
+                        val newNote = note.copy(favourite = !note.favourite)
+                        dao.updateNote(newNote)
                     }
 
                 }) {

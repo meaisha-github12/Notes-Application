@@ -58,7 +58,6 @@ import com.example.takenotes.R
 import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.home.VLRfontfamily
-import com.example.takenotes.ui.theme.BlueColor
 import com.example.takenotes.ui.theme.ColorPickerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -90,7 +89,7 @@ fun EditNotes(
     var pickedImgUri by remember { mutableStateOf<Uri?>(null) }
     var showColorPicker by remember { mutableStateOf(false) }
     var selectedColor by remember {
-        mutableStateOf(BlueColor)
+        mutableStateOf(Color(0xFF92B0F8))
     }
     selectedColor.luminance()
     val pickMedia = rememberLauncherForActivityResult(
@@ -160,7 +159,7 @@ fun EditNotes(
                     .clickable {
                         showColorPicker = true
                     }
-                    ,)
+                    )
                 Spacer(modifier = Modifier.padding(horizontal = 12.dp))
                 Text(
                     "Write Notes!",

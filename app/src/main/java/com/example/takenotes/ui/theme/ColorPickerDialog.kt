@@ -23,7 +23,9 @@ fun ColorPickerDialog(
     onDismiss: () -> Unit,
     onColorChange: (Color) -> Unit
 ) {
-    val listOfColor = listOf(Color(0xFFE52020), Color(0xFFA8A196), Color.Black, Color(0xFF98D8EF), Color(0xFF5CB338),Color(0xFFFFEFC8), Color(0xFFE5D0AC), Color(0xFF66D2CE), Color(0xFF92B0F8))
+    val listOfColor = listOf(Color(0xFFDB9A9A), Color(0xFFA8A196), Color.Black, Color(0xFF98D8EF), Color(
+        0xFFAEDD9B
+    ),Color(0xFFFFEFC8), Color(0xFFE5D0AC), Color(0xFF66D2CE), Color(0xFF92B0F8))
     Dialog(onDismissRequest = { onDismiss() }) {
         Row(
             modifier = Modifier

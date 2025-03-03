@@ -1,6 +1,7 @@
 package com.example.takenotes.ui.screens.home.tabs
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +42,7 @@ import com.example.takenotes.data.Notes
 import com.example.takenotes.ui.screens.addupdatenote.AddUpdateNotesHere
 import com.example.takenotes.ui.screens.components.NoteCard
 import com.example.takenotes.ui.screens.home.VLRfontfamily
-import kotlinx.coroutines.Dispatchers
+import com.example.takenotes.ui.theme.ColorPickerDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,42 +55,72 @@ fun HomeTab(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao
-
+    var isSelectionMode by remember { mutableStateOf(false) }
+    var showColorPicker by remember { mutableStateOf(false) }
     var selectedNotes by remember {
         mutableStateOf<List<Notes>>(emptyList())
     }
-
-    var selectedNoteToDelete by remember {
-        mutableStateOf<Notes?>(null)
+    var selectedColor by remember {
+        mutableStateOf(if (selectedNotes.isNotEmpty()) Color(selectedNotes.first().colors) else Color.White)
     }
-    if (selectedNoteToDelete != null) {
+
+    var showDeleteConfirmation by remember {
+        mutableStateOf(false)
+    }
+
+    if (showDeleteConfirmation) {
         AlertDialog(
-            onDismissRequest = { selectedNoteToDelete = null },
+            onDismissRequest = { showDeleteConfirmation = false },
             confirmButton = {
                 Button(onClick = {
-                    coroutineScope.launch(Dispatchers.IO) {
-//                        val note = selectedNoteToDelete!!
-//                        dao.deleteNote(note)
-//                        selectedNoteToDelete =null
-                        selectedNoteToDelete?.let {
-                            dao.deleteNote(it)
-                            selectedNoteToDelete = null
+                    coroutineScope.launch {
+                        selectedNotes.forEach { note ->
+                            dao.deleteNote(note)
                         }
+
+                        showDeleteConfirmation = false
+                        selectedNotes = emptyList()
+                        isSelectionMode = false
                     }
                 }) {
                     Text(text = "Yes")
                 }
             },
+
             dismissButton = {
                 Button(onClick = {
-                    selectedNoteToDelete = null
+                    showDeleteConfirmation = false
                 }) {
                     Text(text = "No")
                 }
             },
             title = { Text("Conformation") },
-            text = { Text("Are you sure you want to delete ${selectedNoteToDelete!!.tittle}? ") },
+            text = { Text("Are you sure you want to delete ${selectedNotes.size} notes? ") },
         )
+    }
+    if (showColorPicker)
+    {
+        ColorPickerDialog(
+            onColorChange = { newColor ->
+                selectedColor = newColor
+
+                // Apply the color change to selected notes instantly
+                coroutineScope.launch {
+                    selectedNotes.forEach { note ->
+                        dao.updateNote(note.copy(colors = selectedColor.hashCode()))
+                    }
+
+                    // Fetch updated notes after changing color
+                    notesList.value = dao.getAllNotes() // Clear selection
+                    selectedNotes = emptyList()
+                    isSelectionMode = false
+
+                }
+            },
+            onDismiss = { showColorPicker = false }
+        )
+
+
     }
     Column(
         modifier = modifier,
@@ -103,6 +134,38 @@ fun HomeTab(
 
             }
             Spacer(modifier = Modifier.weight(1f))
+
+            if (selectedNotes.isNotEmpty()) {
+                IconButton(onClick = {selectedNotes = emptyList()}) {
+                    Icon(painter = painterResource(R.drawable.cross), contentDescription = "cross", tint = Color.Unspecified)
+                }
+                IconButton(onClick = {
+                    showDeleteConfirmation = true
+                }) {
+                    Icon(painter = painterResource(R.drawable.delete),
+                        tint = Color.Unspecified,
+                        contentDescription = "")
+
+                }
+               Box(modifier = Modifier.size(30.dp)
+               )
+               {
+                   IconButton(onClick = {
+                       showColorPicker = true
+
+                   }) {
+                       Icon(painter = painterResource(R.drawable.wheel), contentDescription = "",Modifier.size(28.dp),
+                           tint = Color.Unspecified,)
+                   }
+
+// Observe changes and refresh UI after update
+
+
+
+               }
+            }
+
+
 
         }
         Spacer(
@@ -118,35 +181,43 @@ fun HomeTab(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 28.dp)
         )
+
+
         //    Spacer(modifier.padding(12.dp))
         // LazyVerticalStaggeredGrid Only
-        LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp),
-            modifier = Modifier
-                // weight here
-                .weight(1f),
-            content = {
-                items(notesList.value) { note ->
-                    NoteCard(
-                        note = note,
-                        selected = selectedNotes.contains(note),
-                        onClick = {
-                            if(selectedNotes.isNotEmpty()){
-                                if(selectedNotes.contains(note)){
-                                    selectedNotes = selectedNotes
-                                }
-                                selectedNotes = selectedNotes + note
+        LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp), modifier = Modifier
+            // weight here
+            .weight(1f), content = {
+            items(notesList.value) { note ->
+
+                NoteCard(note = note, selected = selectedNotes.contains(note),
+                    onClick = {
+                        if (isSelectionMode) {
+
+                            // Toggle the selection (add if not selected, remove if already selected)
+                            selectedNotes = if (selectedNotes.contains(note)) {
+                                selectedNotes - note
                             } else {
-                                navigator.push(AddUpdateNotesHere(note))
+                                selectedNotes + note
+
                             }
-                        },
-                        onLongClick = {
-                            selectedNotes = selectedNotes + note
-//                            selectedNoteToDelete = note
+
+                            // If no notes left selected, exit selection mode
+                            isSelectionMode = selectedNotes.isNotEmpty()
                         }
-                    )
-                }
-            })
+                        else{
+                            navigator.push(AddUpdateNotesHere(note))
+                        }
+                    }, onLongClick = {
+                        isSelectionMode = true
+                        selectedNotes = selectedNotes + note
+//                            selectedNoteToDelete = note
+                    })
+
+            }
+        })
         // Floating Button
+
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
         ) {
