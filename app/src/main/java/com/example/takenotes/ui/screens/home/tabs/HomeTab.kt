@@ -1,7 +1,7 @@
 package com.example.takenotes.ui.screens.home.tabs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -126,48 +126,51 @@ fun HomeTab(
         modifier = modifier,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp) // Consistent padding
+                .background(Color(0xFFFBFCFD), shape = RoundedCornerShape(12.dp)) // Light background with rounded edges
         ) {
-            IconButton(modifier = Modifier.size(48.dp), onClick = {
-                // Handle the click event here
-            }) {
-
-            }
-            Spacer(modifier = Modifier.weight(1f))
-
             if (selectedNotes.isNotEmpty()) {
-                IconButton(onClick = {selectedNotes = emptyList()}) {
-                    Icon(painter = painterResource(R.drawable.cross), contentDescription = "cross", tint = Color.Unspecified)
+                // Cancel Selection Icon
+                IconButton(
+                    modifier = Modifier.size(40.dp), // Consistent size
+                    onClick = { selectedNotes = emptyList() }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.cross),
+                        contentDescription = "Cancel Selection",
+                        tint = Color.Unspecified
+                    )
                 }
-                IconButton(onClick = {
-                    showDeleteConfirmation = true
-                }) {
-                    Icon(painter = painterResource(R.drawable.delete),
-                        tint = Color.Unspecified,
-                        contentDescription = "")
 
+                // Delete Icon
+                IconButton(
+                    modifier = Modifier.size(40.dp), // Equal size
+                    onClick = { showDeleteConfirmation = true }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.delete),
+                        contentDescription = "Delete",
+                        tint = Color.Unspecified
+                    )
                 }
-               Box(modifier = Modifier.size(30.dp)
-               )
-               {
-                   IconButton(onClick = {
-                       showColorPicker = true
 
-                   }) {
-                       Icon(painter = painterResource(R.drawable.wheel), contentDescription = "",Modifier.size(28.dp),
-                           tint = Color.Unspecified,)
-                   }
-
-// Observe changes and refresh UI after update
-
-
-
-               }
+                // Color Picker Icon
+                IconButton(
+                    modifier = Modifier.size(40.dp),
+                    onClick = { showColorPicker = true }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.wheel),
+                        contentDescription = "Change Color",
+                        modifier = Modifier.size(36.dp), // Slightly larger
+                        tint = Color.Unspecified
+                    )
+                }
             }
-
-
-
         }
+
         Spacer(
             modifier = Modifier.padding(12.dp)
         )
