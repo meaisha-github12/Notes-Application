@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,6 +63,7 @@ import com.example.takenotes.ui.theme.ColorPickerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -71,61 +73,140 @@ data class AddUpdateNotesHere(
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content() {
+        var pickedImgUri by remember { mutableStateOf<Uri?>(null) }
+        var title by remember { mutableStateOf(notes?.tittle ?: "") }
+        var body by remember { mutableStateOf(notes?.description ?: "") }
+        val context = LocalContext.current
+        val dao = ApplicationClass.getApp(context).dao
         val navigator = LocalNavigator.currentOrThrow
+        var showColorPicker by remember { mutableStateOf(false) }
+        var selectedColor by remember {
+            mutableStateOf(Color(0xFF92B0F8))
+        }
+
+        val scope = rememberCoroutineScope()
+        // opens gallary?
+        val pickMedia = rememberLauncherForActivityResult(
+            ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            if (uri != null) {
+                pickedImgUri = uri
+            }
+        }
+        if (showColorPicker) {
+            ColorPickerDialog(onColorChange = { newColor ->
+                selectedColor = newColor
+                showColorPicker = false
+
+            }, onDismiss = { showColorPicker = false })
+
+        }
         Scaffold(
             modifier = Modifier.fillMaxSize(),
         ) {
-            EditNotes(notes = notes)
+            EditNotes(
+                notes = notes,
+                title = title,
+                body = body,
+                modifier = Modifier,
+                onTitleChange = { newTitle -> title = newTitle },
+                onBodyChange = { newBody -> body = newBody },
+                onSaveClick = {
+                    if (title.isNotEmpty() && body.isNotEmpty()) {
+                        scope.launch{
+                            // Switch to a background thread for the database operation
+                            withContext(Dispatchers.IO) {
+
+                            if (notes == null) {
+                                dao.insertNote(
+                                    Notes(
+                                    tittle = title,
+                                    description = body,
+                                    colors = selectedColor.toArgb(),
+                                    imageUrl = pickedImgUri?.let {
+                                        uriToByteArray(
+                                            it, context
+                                        )
+                                    }))
+                            } else {
+                                var updatedNote = Notes(
+                                    id = notes.id,
+                                    tittle = title,
+                                    description = body,
+                                    updatedAt = System.currentTimeMillis(),
+                                    imageUrl = notes.imageUrl,
+                                    favourite = notes.favourite,
+                                    colors = selectedColor.toArgb()
+                                )
+                                if (pickedImgUri != null) {
+                                    uriToByteArray(pickedImgUri!!, context)?.let { byteArray ->
+                                        updatedNote = updatedNote.copy(
+                                            imageUrl = byteArray
+                                        )
+                                    }
+                                }
+                                dao.updateNote(updatedNote)
+                            }
+                        }
+                            navigator.pop()
+                        }
+
+
+
+                    } else {
+                        val text = "Please fill all the fields"
+                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+                    }
+
+                },
+                showColorPicker = showColorPicker,
+                selectedColor = selectedColor,
+                pickedImgUri = pickedImgUri,
+                onColorSelectorClick = {
+                    showColorPicker = true
+                },
+                onImagePickClick = {
+                    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+                onBackClick = {
+                    navigator.pop()
+                }
+
+
+
+            )
         }
     }
 }
 
 @Composable
 fun EditNotes(
-    modifier: Modifier = Modifier, notes: Notes?
+    modifier: Modifier = Modifier,
+    notes: Notes?,
+    title: String,
+    body: String,
+    showColorPicker: Boolean,
+    selectedColor: Color,
+    onTitleChange: (String) -> Unit,
+    onBodyChange: (String) -> Unit,
+    onSaveClick: () -> Unit,
+    pickedImgUri: Uri?,
+    onColorSelectorClick: () -> Unit,
+    onImagePickClick: () -> Unit,
+    onBackClick: () -> Unit,
+
+
 ) {
-    //Parent (EditNotes) owns pickedImgUri (the selected image URI).
-    // this updates time to time
-    var pickedImgUri by remember { mutableStateOf<Uri?>(null) }
-    var showColorPicker by remember { mutableStateOf(false) }
-    var selectedColor by remember {
-        mutableStateOf(Color(0xFF92B0F8))
-    }
-    selectedColor.luminance()
-    val pickMedia = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        if (uri != null) {
-            pickedImgUri = uri
-        }
-    }
-    val navigator = LocalNavigator.currentOrThrow
+
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
-    var title = remember {
-        mutableStateOf(notes?.tittle ?: "")
-    }
-    val body = remember {
-        mutableStateOf(notes?.description ?: "")
-    }
-    val dao = ApplicationClass.getApp(context).dao
 
-    if(showColorPicker){
-        ColorPickerDialog(
-            onColorChange = { newColor ->
-                showColorPicker = false
-                selectedColor = newColor
-
-            },
-            onDismiss = { showColorPicker = false }
-        )
-
-    }
-
-    Box(modifier = Modifier
+    selectedColor.luminance()
+    Box(
+        modifier = Modifier
 //        .background(selectedColor)
-        .fillMaxSize()
-        .padding(top = 46.dp)) {
+            .fillMaxSize()
+            .padding(top = 46.dp)
+    ) {
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
@@ -136,7 +217,7 @@ fun EditNotes(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 IconButton(modifier = Modifier.size(38.dp), onClick = {
-                    navigator.pop()
+                    onBackClick()
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.backarrow),
@@ -146,20 +227,14 @@ fun EditNotes(
 
                 }
 
-//                IconButton(
-//                    onClick = {
-//                        showColorPicker = true},
-//                ) {
-//                    Icon(
-//                        painter = painterResource(R.drawable.wheel), // Add this icon in res/drawable
-//                        contentDescription = "Pick Color", tint = Color.Unspecified
-//                    )
-//                }
-                Box(modifier = Modifier.size(28.dp).background(selectedColor, shape = CircleShape)
-                    .clickable {
-                        showColorPicker = true
-                    }
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .background(selectedColor, shape = CircleShape)
+                        .clickable {
+                            onColorSelectorClick()
+
+                        })
                 Spacer(modifier = Modifier.padding(horizontal = 12.dp))
                 Text(
                     "Write Notes!",
@@ -177,26 +252,27 @@ fun EditNotes(
                 Spacer(modifier = Modifier.height(24.dp))
 
 
-                OutlinedTextField(value = title.value, onValueChange = { newValue: String ->
-                    Log.e("112233", "onValueChanged $newValue")
-                    title.value = newValue
-                }, label = {
-                    Text(
-                        "Note Title",
-                        fontFamily = VLRfontfamily,
-                        color = Color(0xFF8299CF),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }, placeholder = { Text(text = "Untitled") }, modifier = Modifier.fillMaxWidth()
+                OutlinedTextField(
+                    value = title, onValueChange = {
+                        onTitleChange(it)
+
+                    }, label = {
+                        Text(
+                            "Note Title",
+                            fontFamily = VLRfontfamily,
+                            color = Color(0xFF8299CF),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }, placeholder = { Text(text = "Untitled") }, modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = body.value,
+                    value = body,
                     onValueChange = { newValue: String ->
-                        body.value = newValue
+                        onBodyChange(newValue)
                     },
                     label = {
                         Text(
@@ -224,70 +300,24 @@ fun EditNotes(
                     )
                 }
             }
-
             ImagePicker(
-                imageUri = pickedImgUri,
-                onImagePick = {
+                imageUri = pickedImgUri, onImagePick = { onImagePickClick() })
 
-                    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                }
-            )
+
+
             Spacer(modifier = Modifier.height(24.dp))
-//         FloatingActionButton
+
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
             ) {
                 // Condition
-                FloatingActionButton(containerColor = Color(0xFF92B0F8),
+                FloatingActionButton(
+                    containerColor = Color(0xFF92B0F8),
                     contentColor = Color.White,
                     modifier = Modifier
                         .padding(12.dp)
                         .width(100.dp),
-                    onClick = {
-                        if (title.value.isNotEmpty() && body.value.isNotEmpty()) {
-
-                            GlobalScope.launch(Dispatchers.IO) {
-
-                                if (notes == null) {
-                                    dao.insertNote(
-                                        Notes(
-                                            tittle = title.value,
-                                            description = body.value,
-                                            colors = selectedColor.toArgb(),
-                                            imageUrl = pickedImgUri?.let {
-                                                uriToByteArray(
-                                                    it,
-                                                    context
-                                                )
-                                            }
-                                        )
-                                    )
-                                } else {
-                                    var updatedNote = Notes(
-                                        id = notes.id,
-                                        tittle = title.value,
-                                        description = body.value,
-                                        updatedAt = System.currentTimeMillis(),
-                                        imageUrl = notes.imageUrl,
-                                        favourite = notes.favourite,
-                                        colors = selectedColor.toArgb()
-                                    )
-                                    if (pickedImgUri != null) {
-                                        uriToByteArray(pickedImgUri!!, context)?.let { byteArray ->
-                                            updatedNote = updatedNote.copy(
-                                                imageUrl = byteArray
-                                            )
-                                        }
-                                    }
-                                    dao.updateNote(updatedNote)
-                                }
-                            }
-                            navigator.pop()
-                        } else {
-                            val text = "Please fill all the fields"
-                            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
-                        }
-                    }) {
+                    onClick = { onSaveClick() }) {
                     if (notes == null) {
                         Text(text = "Save", fontSize = 16.sp)
                     } else {
@@ -328,12 +358,7 @@ fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
 
 @Composable
 fun ImagePicker(
-    //Child (ImagePicker) cannot change pickedImgUri directly
-    // hoisting the image uri
-    imageUri: Uri? = null,     // Receives the current image state.
-    //  Child calls onImagePick() to ask the parent to pick an image.
-
-    onImagePick: () -> Unit,   // Receives a callback to launch the gallery.
+    imageUri: Uri?, onImagePick: () -> Unit // Receives a callback to launch the gallery.
 ) {
 // img picking code
     Column {
@@ -349,8 +374,3 @@ fun ImagePicker(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EditNotes(notes = null)
-}
