@@ -6,7 +6,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-
+// Step 2
+// this file knows what possible commands are on the data.
 @Dao
 interface NotesDao {
     @Insert

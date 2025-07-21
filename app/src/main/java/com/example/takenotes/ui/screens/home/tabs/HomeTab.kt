@@ -48,80 +48,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeTab(
     modifier: Modifier = Modifier,
-    themePreferences: ThemePreferences,
-    notesList: MutableState<List<Notes>>,
+    notes: List<Notes>,
+    showDeleteConfirmation: Boolean = false,
+    selectedNotes: List<Notes>,
+    onNoteClick: (Notes) -> Unit,
+    onNoteLongClick: (Notes) -> Unit,
+    onDeleteClick: () -> Unit, // Renamed for clarity
+    onColorPickerClick: () -> Unit,
+    onCancelSelectionClick: () -> Unit,
+    onCreateNoteClick:()->Unit
+
 ) {
     val navigator = LocalNavigator.currentOrThrow
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val dao = ApplicationClass.getApp(context).dao
-    var isSelectionMode by remember { mutableStateOf(false) }
-    var showColorPicker by remember { mutableStateOf(false) }
-    var selectedNotes by remember {
-        mutableStateOf<List<Notes>>(emptyList())
-    }
-    var selectedColor by remember {
-        mutableStateOf(if (selectedNotes.isNotEmpty()) Color(selectedNotes.first().colors) else Color.White)
-    }
-
-    var showDeleteConfirmation by remember {
-        mutableStateOf(false)
-    }
-
-    if (showDeleteConfirmation) {
-        AlertDialog(
-            onDismissRequest = { showDeleteConfirmation = false },
-            confirmButton = {
-                Button(onClick = {
-                    coroutineScope.launch {
-                        selectedNotes.forEach { note ->
-                            dao.deleteNote(note)
-                        }
-
-                        showDeleteConfirmation = false
-                        selectedNotes = emptyList()
-                        isSelectionMode = false
-                    }
-                }) {
-                    Text(text = "Yes")
-                }
-            },
-
-            dismissButton = {
-                Button(onClick = {
-                    showDeleteConfirmation = false
-                }) {
-                    Text(text = "No")
-                }
-            },
-            title = { Text("Conformation") },
-            text = { Text("Are you sure you want to delete ${selectedNotes.size} notes? ") },
-        )
-    }
-    if (showColorPicker)
-    {
-        ColorPickerDialog(
-            onColorChange = { newColor ->
-                selectedColor = newColor
-
-                // Apply the color change to selected notes instantly
-                coroutineScope.launch {
-                    selectedNotes.forEach { note ->
-                        dao.updateNote(note.copy(colors = selectedColor.hashCode()))
-                    }
-
-                    // Fetch updated notes after changing color
-                    notesList.value = dao.getAllNotes() // Clear selection
-                    selectedNotes = emptyList()
-                    isSelectionMode = false
-
-                }
-            },
-            onDismiss = { showColorPicker = false }
-        )
 
 
-    }
+
     Column(
         modifier = modifier,
     ) {
@@ -135,7 +76,7 @@ fun HomeTab(
                 // Cancel Selection Icon
                 IconButton(
                     modifier = Modifier.size(40.dp), // Consistent size
-                    onClick = { selectedNotes = emptyList() }
+                    onClick = { onCancelSelectionClick() }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.cross),
@@ -147,7 +88,7 @@ fun HomeTab(
                 // Delete Icon
                 IconButton(
                     modifier = Modifier.size(40.dp), // Equal size
-                    onClick = { showDeleteConfirmation = true }
+                    onClick = { onDeleteClick() }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.delete),
@@ -159,7 +100,7 @@ fun HomeTab(
                 // Color Picker Icon
                 IconButton(
                     modifier = Modifier.size(40.dp),
-                    onClick = { showColorPicker = true }
+                    onClick = { onColorPickerClick() }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.wheel),
@@ -191,30 +132,13 @@ fun HomeTab(
         LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Adaptive(120.dp), modifier = Modifier
             // weight here
             .weight(1f), content = {
-            items(notesList.value) { note ->
+            items(notes) { note ->
 
                 NoteCard(note = note, selected = selectedNotes.contains(note),
                     onClick = {
-                        if (isSelectionMode) {
-
-                            // Toggle the selection (add if not selected, remove if already selected)
-                            selectedNotes = if (selectedNotes.contains(note)) {
-                                selectedNotes - note
-                            } else {
-                                selectedNotes + note
-
-                            }
-
-                            // If no notes left selected, exit selection mode
-                            isSelectionMode = selectedNotes.isNotEmpty()
-                        }
-                        else{
-                            navigator.push(AddUpdateNotesHere(note))
-                        }
+                        onNoteClick(note)
                     }, onLongClick = {
-                        isSelectionMode = true
-                        selectedNotes = selectedNotes + note
-//                            selectedNoteToDelete = note
+                       onNoteLongClick(note)
                     })
 
             }
@@ -228,8 +152,8 @@ fun HomeTab(
                 contentColor = Color.White,
                 shape = RoundedCornerShape(18.dp),
                 modifier = Modifier.padding(12.dp),
-                onClick = { /*TODO*/
-                    navigator.push(AddUpdateNotesHere())
+                onClick = {
+                    onCreateNoteClick()
                 }) {
                 Row(
                     modifier = Modifier.padding(8.dp),

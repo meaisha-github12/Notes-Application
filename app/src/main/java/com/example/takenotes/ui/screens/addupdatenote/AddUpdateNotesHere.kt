@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -83,6 +84,7 @@ data class AddUpdateNotesHere(
         var selectedColor by remember {
             mutableStateOf(Color(0xFF92B0F8))
         }
+        val scrollState = rememberScrollState()
 
         val scope = rememberCoroutineScope()
         // opens gallary?
@@ -170,7 +172,8 @@ data class AddUpdateNotesHere(
                 },
                 onBackClick = {
                     navigator.pop()
-                }
+                },
+               scrollState = scrollState
 
 
 
@@ -194,11 +197,12 @@ fun EditNotes(
     onColorSelectorClick: () -> Unit,
     onImagePickClick: () -> Unit,
     onBackClick: () -> Unit,
+    scrollState: ScrollState
 
 
 ) {
 
-    val scrollState = rememberScrollState()
+
 
     selectedColor.luminance()
     Box(

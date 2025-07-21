@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -42,10 +43,14 @@ import com.example.takenotes.R
 import com.example.takenotes.core.ApplicationClass
 import com.example.takenotes.core.ThemePreferences
 import com.example.takenotes.data.Notes
+import com.example.takenotes.ui.screens.addupdatenote.AddUpdateNotesHere
 import com.example.takenotes.ui.screens.home.tabs.FavTab
 import com.example.takenotes.ui.screens.home.tabs.HomeTab
 import com.example.takenotes.ui.screens.settings.settingsTab
+import com.example.takenotes.ui.theme.ColorPickerDialog
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeScreen(val themePreferences: ThemePreferences) : Screen {
@@ -53,6 +58,7 @@ class HomeScreen(val themePreferences: ThemePreferences) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
         Scaffold(
             modifier = Modifier.fillMaxSize(
             )
@@ -76,8 +82,15 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
     val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
     val dao = ApplicationClass.getApp(context).dao
-    val coroutineScope = rememberCoroutineScope()
     var notesList = remember { mutableStateOf<List<Notes>>(emptyList()) }
+    var isSelectionMode by remember { mutableStateOf(false) }
+    var showColorPicker by remember { mutableStateOf(false) }
+    var selectedNotes by remember { mutableStateOf<List<Notes>>(emptyList()) }
+    var selectedColor by remember {
+        mutableStateOf(if (selectedNotes.isNotEmpty()) Color(selectedNotes.first().colors) else Color.White)
+    }
+    val coroutineScope = rememberCoroutineScope()
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
     // Use a coroutine to load the notes from the database
     LaunchedEffect(Unit) {
         // Fetch notes in the IO dispatcher
@@ -87,8 +100,6 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
             }
         }
     }
-    // val themePreference = ThemePreference(context)
-    var checked by remember { mutableStateOf(true) }
     Box(modifier = modifier.padding(top = 12.dp)) {
         Column(Modifier.padding(12.dp)) {
             // Top bar with menu icon and profile picture
@@ -97,9 +108,96 @@ fun HomeView(modifier: Modifier = Modifier, themePreferences: ThemePreferences) 
                 when (footerState.value) {
                     FooterContent.Home -> {
                         HomeTab(
-                            themePreferences = themePreferences,
-                            notesList = notesList,
-                        )
+                            notes = notesList.value, //<-- Pass the actual list, not the MutableState
+                            selectedNotes = selectedNotes,
+                            onNoteClick = { clickedNote ->
+                                if (isSelectionMode) {
+                                    // Toggle the selection (add if not selected, remove if already selected)
+                                    selectedNotes = if (selectedNotes.contains(clickedNote)) {
+                                        selectedNotes - clickedNote
+                                    } else {
+                                        selectedNotes + clickedNote
+
+                                    }
+                                    // If no notes left selected, exit selection mode
+                                    isSelectionMode = selectedNotes.isNotEmpty()
+                                } else {
+                                    navigator.push(AddUpdateNotesHere(clickedNote))
+                                }
+                            },
+                            onNoteLongClick = { longClickedNote ->
+                                isSelectionMode = true
+                                selectedNotes = selectedNotes + longClickedNote
+                            },
+                            onDeleteClick = {
+                                showDeleteConfirmation = true
+                            },
+                            onColorPickerClick = {
+                                showColorPicker = true
+                            },
+                            onCancelSelectionClick = {
+                                isSelectionMode = false
+                                selectedNotes = emptyList()
+                            },
+                            onCreateNoteClick = {
+                                navigator.push(AddUpdateNotesHere())
+                            }
+
+
+                            )
+
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            confirmButton = {
+                Button(onClick = {
+                    coroutineScope.launch {
+                        selectedNotes.forEach { note ->
+                            dao.deleteNote(note)
+                        }
+
+                        showDeleteConfirmation = false
+                        selectedNotes = emptyList()
+                        isSelectionMode = false
+                    }
+                }) {
+                    Text(text = "Yes")
+                }
+            },
+
+            dismissButton = {
+                Button(onClick = {
+                    showDeleteConfirmation = false
+                }) {
+                    Text(text = "No")
+                }
+            },
+            title = { Text("Conformation") },
+            text = { Text("Are you sure you want to delete ${selectedNotes.size} notes? ") },
+        )
+    }
+    if (showColorPicker)
+    {
+        ColorPickerDialog(
+            onColorChange = { newColor ->
+                selectedColor = newColor
+
+                // Apply the color change to selected notes instantly
+                coroutineScope.launch {
+                    selectedNotes.forEach { note ->
+                        dao.updateNote(note.copy(colors = selectedColor.hashCode()))
+                    }
+
+                    selectedNotes = emptyList()
+                    isSelectionMode = false
+
+                }
+            },
+            onDismiss = { showColorPicker = false }
+        )
+
+
+    }
                     }
 
                     FooterContent.Favourites -> {
@@ -189,9 +287,10 @@ fun Footer(
             val selectedOption = fc == footerState
             val containerColor = if (selectedOption) Color(0xFF7793D6) else Color.Transparent
             val contentColor = if (selectedOption) Color.White else Color.Black
-            Button(colors = ButtonDefaults.buttonColors(
-                containerColor = containerColor, contentColor = contentColor
-            ),
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = containerColor, contentColor = contentColor
+                ),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(),
                 onClick = {
